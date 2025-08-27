@@ -187,8 +187,8 @@
       background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
       border: 1px solid var(--border-light);
       box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255,255,255,.1);
+      overflow: hidden;
     }
-    
     .brand::before{
       content: "";
       position: absolute;
@@ -199,11 +199,12 @@
       opacity: .6;
       filter: blur(8px);
     }
-    
-    .brand svg{ 
-      width:90%; 
-      height:90%; 
-      filter: drop-shadow(0 0 15px rgba(83,215,255,.4)) drop-shadow(0 0 25px rgba(168,139,255,.3)); 
+    .brand img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      border-radius: inherit;
+      filter: drop-shadow(0 0 15px rgba(83,215,255,.25)) drop-shadow(0 0 25px rgba(168,139,255,.2));
     }
 
     /* Enhanced tag */
@@ -286,8 +287,17 @@
       min-height: 120px;
       will-change: transform;
       transform: translateZ(0);
+      animation: fadeInUp 0.6s ease-out forwards;
     }
-    
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+    .card:nth-child(6) { animation-delay: 0.6s; }
+    .card:nth-child(7) { animation-delay: 0.7s; }
+    .card:nth-child(8) { animation-delay: 0.8s; }
+
     a.card::before{
       content:""; 
       position:absolute; 
@@ -313,7 +323,6 @@
     
     .card:hover::before{ opacity:.8 }
 
-    /* Enhanced icons */
     .ico{
       width:52px; 
       height:52px; 
@@ -365,7 +374,6 @@
       font-weight: 400;
     }
 
-    /* Enhanced arrow */
     .arrow{
       margin-left:auto; 
       width:32px; 
@@ -404,14 +412,12 @@
     
     .spacer{ flex:1 }
 
-    /* Enhanced focus states */
     a.card:focus-visible{
       outline: 2px solid var(--blue); 
       outline-offset: 3px;
       transform: translateY(-6px) scale(1.01);
     }
 
-    /* Enhanced footer */
     footer{ 
       color:var(--muted); 
       text-align:center; 
@@ -422,7 +428,6 @@
       padding-bottom: env(safe-area-inset-bottom, 20px);
     }
 
-    /* Performance optimizations */
     @media (prefers-reduced-motion: reduce){
       .mesh::before,.mesh::after{ animation:none }
       .card, .arrow, .tag i, .install-btn{ transition: none; animation: none; }
@@ -448,7 +453,6 @@
       .install-btn { padding: 10px 16px; font-size: 0.8rem; }
     }
 
-    /* Touch-friendly improvements */
     @media (hover: none){
       .card:hover{ 
         transform: translateY(-4px) scale(1.01); 
@@ -458,7 +462,6 @@
       .card:hover .arrow{ transform: translateX(3px); }
     }
     
-    /* Safe area support */
     @supports (padding: max(0px)){
       body{ 
         padding-bottom:max(20px, env(safe-area-inset-bottom)); 
@@ -466,30 +469,10 @@
       }
     }
 
-    /* Loading animation */
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    .card {
-      animation: fadeInUp 0.6s ease-out forwards;
-    }
-
-    .card:nth-child(1) { animation-delay: 0.1s; }
-    .card:nth-child(2) { animation-delay: 0.2s; }
-    .card:nth-child(3) { animation-delay: 0.3s; }
-    .card:nth-child(4) { animation-delay: 0.4s; }
-    .card:nth-child(5) { animation-delay: 0.5s; }
-    .card:nth-child(6) { animation-delay: 0.6s; }
-    .card:nth-child(7) { animation-delay: 0.7s; }
-    .card:nth-child(8) { animation-delay: 0.8s; }
 
     /* PWA Standalone mode styles */
     @media (display-mode: standalone) {
@@ -520,30 +503,8 @@
   <div class="wrap">
     <header>
       <div class="brand" aria-hidden="true">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#53d7ff"/>
-              <stop offset="30%" stop-color="#39ffb6"/>
-              <stop offset="70%" stop-color="#a88bff"/>
-              <stop offset="100%" stop-color="#ff6b9d"/>
-            </linearGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-              <feMerge> 
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-          <rect x="12" y="12" width="176" height="176" rx="36" fill="rgba(10,18,32,.9)" stroke="url(#g1)" stroke-width="4"/>
-          <g fill="none" stroke="url(#g1)" stroke-width="4" opacity=".7" filter="url(#glow)">
-            <path d="M40 100h120"/>
-            <path d="M70 70v60"/>
-            <path d="M130 60v80"/>
-          </g>
-          <text x="100" y="118" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="900" fill="url(#g1)" filter="url(#glow)">EB</text>
-        </svg>
+        <!-- ใช้รูปไอคอนที่กำหนดเป็นแบรนด์ในหน้า -->
+        <img id="brandImg" alt="EBassWave Logo">
       </div>
       <span class="tag" aria-label="AI style tag"><i></i> Modern • AI • Tech</span>
       <h1 aria-label="EBassWave AI Hub">EBassWave AI Hub</h1>
@@ -551,7 +512,6 @@
     </header>
 
     <main class="grid" aria-label="Quick Links">
-      <!-- Cards remain the same as before -->
       <a class="card" href="https://basssg.github.io/TAPro-DEV/" style="--glow: var(--cyan)" aria-label="TAPro">
         <div class="row">
           <div class="ico" aria-hidden="true">
@@ -676,7 +636,7 @@
         <div class="row">
           <div class="ico">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z"/>
+              <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c้0 5.8 7 11 7 11z"/>
               <circle cx="12" cy="10" r="2.5"/>
             </svg>
           </div>
@@ -720,6 +680,10 @@
   </div>
 
   <script>
+    // ===================== ICON SOURCE (EXTERNAL) =====================
+    const ICON_URL = "https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372";
+    document.getElementById('brandImg').src = ICON_URL;
+
     // Enhanced PWA functionality
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
@@ -734,7 +698,6 @@
           card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
           card.style.setProperty('--my', (e.clientY - r.top) + 'px');
         }, {passive:true});
-        
         card.addEventListener('pointerleave', ()=>{
           card.style.setProperty('--mx', '50%');
           card.style.setProperty('--my', '50%');
@@ -745,144 +708,114 @@
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Enhanced PWA icon generation
-    function makeIcon(size, maskable = false){
-      const c = document.createElement('canvas'); 
-      c.width = c.height = size; 
-      const x = c.getContext('2d');
-      
-      // Enhanced background with gradient
-      if (maskable) {
-        // For maskable icons, use full canvas
-        const g = x.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
-        g.addColorStop(0,'#0f1625'); 
-        g.addColorStop(1,'#0b111b');
-        x.fillStyle = g; 
-        x.fillRect(0,0,size,size);
-      } else {
-        // For regular icons, add padding
-        const padding = size * 0.1;
-        const g = x.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2 - padding);
-        g.addColorStop(0,'#0f1625'); 
-        g.addColorStop(1,'#0b111b');
-        x.fillStyle = g; 
-        x.fillRect(padding, padding, size - padding*2, size - padding*2);
-      }
-      
-      // Enhanced neon ring with glow
-      const r = size * (maskable ? 0.32 : 0.38); 
-      x.lineWidth = Math.max(3, size*0.035);
-      const g2 = x.createLinearGradient(0,0,size,size);
-      g2.addColorStop(0,'#53d7ff'); 
-      g2.addColorStop(.25,'#39ffb6'); 
-      g2.addColorStop(.75,'#a88bff');
-      g2.addColorStop(1,'#ff6b9d');
-      
-      // Glow effect
-      x.shadowColor = '#53d7ff';
-      x.shadowBlur = size*0.06;
-      x.strokeStyle = g2; 
-      x.beginPath(); 
-      x.arc(size/2,size/2,r,0,Math.PI*2); 
-      x.stroke();
-      
-      // Reset shadow for text
-      x.shadowBlur = 0;
-      
-      // Enhanced text with better positioning
-      x.font = `900 ${Math.floor(size*(maskable ? 0.28 : 0.32))}px Inter, Arial`;
-      x.textAlign = 'center'; 
-      x.textBaseline = 'middle';
-      const g3 = x.createLinearGradient(0,0,size,size); 
-      g3.addColorStop(0,'#53d7ff'); 
-      g3.addColorStop(.4,'#39ffb6');
-      g3.addColorStop(.8,'#a88bff');
-      g3.addColorStop(1,'#ff6b9d');
-      x.fillStyle = g3; 
-      x.fillText('EB', size/2, size/2+size*0.012);
-      
-      return c.toDataURL('image/png');
+    // ===================== LOAD & GENERATE ICON SIZES =====================
+    function loadImage(url){
+      return new Promise((resolve, reject)=>{
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // try CORS; if server disallows, we will fallback
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+      });
     }
 
-    // Generate all required icon sizes
-    const icon16 = makeIcon(16);
-    const icon32 = makeIcon(32);
-    const icon48 = makeIcon(48);
-    const icon72 = makeIcon(72);
-    const icon96 = makeIcon(96);
-    const icon128 = makeIcon(128);
-    const icon144 = makeIcon(144);
-    const icon152 = makeIcon(152);
-    const icon180 = makeIcon(180);
-    const icon192 = makeIcon(192);
-    const icon384 = makeIcon(384);
-    const icon512 = makeIcon(512);
-    const icon192Maskable = makeIcon(192, true);
-    const icon512Maskable = makeIcon(512, true);
+    function drawCover(ctx, img, size){
+      // center-crop to square and cover the canvas
+      const iw = img.naturalWidth || img.width;
+      const ih = img.naturalHeight || img.height;
+      const minSide = Math.min(iw, ih);
+      const sx = (iw - minSide) / 2;
+      const sy = (ih - minSide) / 2;
+      ctx.clearRect(0,0,size,size);
+      ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+    }
 
-    // Enhanced favicon and apple touch icon
-    const fav16 = document.createElement('link'); 
-    fav16.rel='icon'; fav16.type='image/png'; fav16.sizes='16x16'; fav16.href=icon16; 
-    document.head.appendChild(fav16);
-    
-    const fav32 = document.createElement('link'); 
-    fav32.rel='icon'; fav32.type='image/png'; fav32.sizes='32x32'; fav32.href=icon32; 
-    document.head.appendChild(fav32);
-    
-    const apt = document.createElement('link'); 
-    apt.rel='apple-touch-icon'; apt.sizes='180x180'; apt.href=icon180; 
-    document.head.appendChild(apt);
-
-    // Enhanced manifest with all required properties
-    const manifest = {
-      name: 'EBassWave AI Hub',
-      short_name: 'EBassWave',
-      description: 'ศูนย์กลางงานของคุณในที่เดียว—ดีไซน์เรียบ สะอาด โมเดิร์น โทนนีออนล้ำสมัย',
-      start_url: '/',
-      scope: '/',
-      display: 'standalone',
-      orientation: 'portrait-primary',
-      background_color: '#0b111b',
-      theme_color: '#0b111b',
-      lang: 'th',
-      dir: 'ltr',
-      categories: ['productivity', 'utilities', 'business'],
-      screenshots: [
-        {
-          src: icon512,
-          sizes: '512x512',
-          type: 'image/png',
-          form_factor: 'narrow'
+    async function generateIconDataURLs(){
+      const sizes = [16,32,48,72,96,128,144,152,180,192,384,512];
+      try{
+        const img = await loadImage(ICON_URL);
+        const out = {};
+        for (const s of sizes){
+          const c = document.createElement('canvas');
+          c.width = c.height = s;
+          const x = c.getContext('2d');
+          drawCover(x, img, s);
+          out[s] = c.toDataURL('image/png');
         }
-      ],
-      icons: [
-        { src: icon48, sizes: '48x48', type: 'image/png', purpose: 'any' },
-        { src: icon72, sizes: '72x72', type: 'image/png', purpose: 'any' },
-        { src: icon96, sizes: '96x96', type: 'image/png', purpose: 'any' },
-        { src: icon128, sizes: '128x128', type: 'image/png', purpose: 'any' },
-        { src: icon144, sizes: '144x144', type: 'image/png', purpose: 'any' },
-        { src: icon152, sizes: '152x152', type: 'image/png', purpose: 'any' },
-        { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
-        { src: icon384, sizes: '384x384', type: 'image/png', purpose: 'any' },
-        { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any' },
-        { src: icon192Maskable, sizes: '192x192', type: 'image/png', purpose: 'maskable' },
-        { src: icon512Maskable, sizes: '512x512', type: 'image/png', purpose: 'maskable' }
-      ]
-    };
-    
-    const mblob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
-    const mlink = document.createElement('link'); 
-    mlink.rel='manifest'; 
-    mlink.href = URL.createObjectURL(mblob); 
-    document.head.appendChild(mlink);
+        return out;
+      }catch(e){
+        // Fallback: return empty to indicate we should use original URL directly
+        return null;
+      }
+    }
 
-    // Enhanced service worker with caching
+    (async function setupIconsAndManifest(){
+      const iconsMap = await generateIconDataURLs();
+      const use = (sz)=> iconsMap ? iconsMap[sz] : ICON_URL;
+
+      // ===== Favicons & Apple Touch =====
+      const addLink = (rel, sizes, href, type) => {
+        const el = document.createElement('link');
+        el.rel = rel;
+        if (sizes) el.sizes = sizes;
+        if (type) el.type = type;
+        el.href = href;
+        document.head.appendChild(el);
+      };
+      addLink('icon', '16x16', use(16), 'image/png');
+      addLink('icon', '32x32', use(32), 'image/png');
+      addLink('apple-touch-icon', '180x180', use(180), null);
+
+      // ===== Manifest =====
+      const manifest = {
+        name: 'EBassWave AI Hub',
+        short_name: 'EBassWave',
+        description: 'ศูนย์กลางงานของคุณในที่เดียว—ดีไซน์เรียบ สะอาด โมเดิร์น โทนนีออนล้ำสมัย',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        orientation: 'portrait-primary',
+        background_color: '#0b111b',
+        theme_color: '#0b111b',
+        lang: 'th',
+        dir: 'ltr',
+        categories: ['productivity', 'utilities', 'business'],
+        screenshots: [
+          {
+            src: use(512),
+            sizes: '512x512',
+            type: 'image/png',
+            form_factor: 'narrow'
+          }
+        ],
+        icons: [
+          { src: use(48),  sizes: '48x48',  type: 'image/png', purpose: 'any' },
+          { src: use(72),  sizes: '72x72',  type: 'image/png', purpose: 'any' },
+          { src: use(96),  sizes: '96x96',  type: 'image/png', purpose: 'any' },
+          { src: use(128), sizes: '128x128',type: 'image/png', purpose: 'any' },
+          { src: use(144), sizes: '144x144',type: 'image/png', purpose: 'any' },
+          { src: use(152), sizes: '152x152',type: 'image/png', purpose: 'any' },
+          { src: use(180), sizes: '180x180',type: 'image/png', purpose: 'any' },
+          { src: use(192), sizes: '192x192',type: 'image/png', purpose: 'any' },
+          { src: use(384), sizes: '384x384',type: 'image/png', purpose: 'any' },
+          { src: use(512), sizes: '512x512',type: 'image/png', purpose: 'any' }
+        ]
+      };
+      const mblob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+      const mlink = document.createElement('link'); 
+      mlink.rel='manifest'; 
+      mlink.href = URL.createObjectURL(mblob); 
+      document.head.appendChild(mlink);
+    })();
+
+    // ===================== SERVICE WORKER =====================
     if ('serviceWorker' in navigator){
       const swCode = `
         const CACHE_NAME = 'ebasswave-v1';
         const urlsToCache = [
           '/',
-          '/index.html'
+          '/index.html',
+          '${ICON_URL}'
         ];
 
         self.addEventListener('install', event => {
@@ -909,35 +842,22 @@
 
         self.addEventListener('fetch', event => {
           event.respondWith(
-            caches.match(event.request)
-              .then(response => {
-                if (response) {
-                  return response;
-                }
-                return fetch(event.request);
-              }
-            )
+            caches.match(event.request).then(response => {
+              return response || fetch(event.request);
+            })
           );
         });
       `;
-      
       const swBlob = new Blob([swCode], {type:'text/javascript'});
       navigator.serviceWorker.register(URL.createObjectURL(swBlob))
-        .then(registration => {
-          console.log('SW registered successfully');
-        })
-        .catch(error => {
-          console.log('SW registration failed');
-        });
+        .then(() => console.log('SW registered successfully'))
+        .catch(() => console.log('SW registration failed'));
     }
 
-    // PWA Install functionality
+    // ===================== INSTALL PROMPT =====================
     window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('beforeinstallprompt fired');
       e.preventDefault();
       deferredPrompt = e;
-      
-      // Show install button
       installContainer.classList.add('show');
     });
 
@@ -945,33 +865,33 @@
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
+        console.log('Install prompt outcome:', outcome);
         deferredPrompt = null;
         installContainer.classList.remove('show');
       }
     });
 
-    // Hide install button when app is installed
     window.addEventListener('appinstalled', () => {
       console.log('PWA was installed');
       installContainer.classList.remove('show');
       deferredPrompt = null;
     });
 
-    // Check if app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       console.log('App is running in standalone mode');
       installContainer.style.display = 'none';
     }
 
-    // Smooth scroll for better UX
+    // Smooth scroll
     document.documentElement.style.scrollBehavior = 'smooth';
 
     // Performance monitoring
     if ('performance' in window) {
       window.addEventListener('load', () => {
         const perfData = performance.getEntriesByType('navigation')[0];
-        console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+        if (perfData) {
+          console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+        }
       });
     }
   </script>
