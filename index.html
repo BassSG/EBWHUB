@@ -8,11 +8,22 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="EBassWave AI Hub">
+  
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="EBassWave AI Hub">
+  <meta name="msapplication-TileColor" content="#0b111b">
+  <meta name="msapplication-config" content="browserconfig.xml">
+  
   <title>EBassWave AI Hub</title>
+  <meta name="description" content="ศูนย์กลางงานของคุณในที่เดียว—ดีไซน์เรียบ สะอาด โมเดิร์น โทนนีออนล้ำสมัย">
   <meta name="color-scheme" content="dark">
+  
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="manifest" href="manifest.webmanifest">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="#" id="manifest-placeholder">
+  
   <style>
     :root{
       --bg-0:#070b12;
@@ -52,6 +63,61 @@
       min-height: 100vh;
       letter-spacing:.3px;
       overflow-x: hidden;
+    }
+
+    /* Install Button Styles */
+    .install-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(100px);
+      transition: all 0.3s ease;
+    }
+
+    .install-container.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .install-btn {
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      border: none;
+      border-radius: 50px;
+      padding: 12px 20px;
+      color: var(--bg-0);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(83,215,255,.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .install-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(83,215,255,.4);
+    }
+
+    .install-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* Status Bar for PWA */
+    .status-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: env(safe-area-inset-top, 0);
+      background: var(--bg-0);
+      z-index: 1000;
     }
 
     /* Enhanced animated mesh */
@@ -99,6 +165,7 @@
       margin:0 auto; 
       padding: clamp(20px, 4vw, 48px);
       position: relative;
+      padding-top: calc(clamp(20px, 4vw, 48px) + env(safe-area-inset-top, 0));
     }    
     
     header{
@@ -352,18 +419,20 @@
       font-size:.9rem;
       font-weight: 400;
       opacity: .8;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
 
     /* Performance optimizations */
     @media (prefers-reduced-motion: reduce){
       .mesh::before,.mesh::after{ animation:none }
-      .card, .arrow, .tag i{ transition: none; animation: none; }
+      .card, .arrow, .tag i, .install-btn{ transition: none; animation: none; }
     }
 
     @media (max-width:768px){
       .mesh::before,.mesh::after{ filter: blur(40px); opacity: .15; }
       .tag{ backdrop-filter:blur(8px) }
       .grid{ grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+      .install-container { bottom: 15px; right: 15px; }
     }
     
     @media (max-width:480px){
@@ -376,6 +445,7 @@
       .desc{ font-size:.9rem }
       .arrow{ width:28px; height:28px; }
       .brand{ width:72px; height:72px; }
+      .install-btn { padding: 10px 16px; font-size: 0.8rem; }
     }
 
     /* Touch-friendly improvements */
@@ -420,9 +490,32 @@
     .card:nth-child(6) { animation-delay: 0.6s; }
     .card:nth-child(7) { animation-delay: 0.7s; }
     .card:nth-child(8) { animation-delay: 0.8s; }
+
+    /* PWA Standalone mode styles */
+    @media (display-mode: standalone) {
+      .status-bar { display: block; }
+      .install-container { display: none; }
+    }
+
+    @media (display-mode: browser) {
+      .status-bar { display: none; }
+    }
   </style>
 </head>
 <body>
+  <!-- Status bar for PWA -->
+  <div class="status-bar"></div>
+  
+  <!-- Install button -->
+  <div class="install-container" id="installContainer">
+    <button class="install-btn" id="installBtn">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+      </svg>
+      ติดตั้งแอป
+    </button>
+  </div>
+
   <div class="mesh" aria-hidden="true"></div>
   <div class="wrap">
     <header>
@@ -458,7 +551,7 @@
     </header>
 
     <main class="grid" aria-label="Quick Links">
-      <!-- 1: TAPro -->
+      <!-- Cards remain the same as before -->
       <a class="card" href="https://basssg.github.io/TAPro-DEV/" style="--glow: var(--cyan)" aria-label="TAPro">
         <div class="row">
           <div class="ico" aria-hidden="true">
@@ -480,7 +573,6 @@
         </div>
       </a>
 
-      <!-- 2: Dashboard -->
       <a class="card" href="https://basssg.github.io/TAProAlert-Dashboard/" style="--glow: var(--violet)" aria-label="Dashboard">
         <div class="row">
           <div class="ico">
@@ -501,7 +593,6 @@
         </div>
       </a>
 
-      <!-- 3: SnDFX -->
       <a class="card" href="https://basssg.github.io/SnDForex/" style="--glow: var(--green)" aria-label="SnDFX">
         <div class="row">
           <div class="ico">
@@ -522,7 +613,6 @@
         </div>
       </a>
 
-      <!-- 4: GoogleSheet -->
       <a class="card" href="https://basssg.github.io/GoogleSheet/" style="--glow: var(--orange)" aria-label="GoogleSheet">
         <div class="row">
           <div class="ico">
@@ -543,7 +633,6 @@
         </div>
       </a>
 
-      <!-- 5: Google App Script -->
       <a class="card" href="https://basssg.github.io/GoogleAppScript/" style="--glow: var(--pink)" aria-label="Google App Script">
         <div class="row">
           <div class="ico">
@@ -563,7 +652,6 @@
         </div>
       </a>
 
-      <!-- 6: Investment -->
       <a class="card" href="https://basssg.github.io/Investment/" style="--glow: var(--blue)" aria-label="Investment">
         <div class="row">
           <div class="ico">
@@ -584,7 +672,6 @@
         </div>
       </a>
 
-      <!-- 7: TripPlanner -->
       <a class="card" href="https://basssg.github.io/TripPlanner/" style="--glow: var(--green)" aria-label="TripPlanner">
         <div class="row">
           <div class="ico">
@@ -605,7 +692,6 @@
         </div>
       </a>
 
-      <!-- 8: PickUp -->
       <a class="card" href="https://basssg.github.io/Pickup/" style="--glow: var(--cyan)" aria-label="PickUp">
         <div class="row">
           <div class="ico">
@@ -634,6 +720,11 @@
   </div>
 
   <script>
+    // Enhanced PWA functionality
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+    const installContainer = document.getElementById('installContainer');
+
     // Enhanced hover glow effect
     const canHover = matchMedia('(hover: hover)').matches;
     if (canHover){
@@ -654,31 +745,42 @@
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Enhanced PWA icons
-    function makeIcon(size){
+    // Enhanced PWA icon generation
+    function makeIcon(size, maskable = false){
       const c = document.createElement('canvas'); 
       c.width = c.height = size; 
       const x = c.getContext('2d');
       
       // Enhanced background with gradient
-      const g = x.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
-      g.addColorStop(0,'#0f1625'); 
-      g.addColorStop(1,'#0b111b');
-      x.fillStyle = g; 
-      x.fillRect(0,0,size,size);
+      if (maskable) {
+        // For maskable icons, use full canvas
+        const g = x.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+        g.addColorStop(0,'#0f1625'); 
+        g.addColorStop(1,'#0b111b');
+        x.fillStyle = g; 
+        x.fillRect(0,0,size,size);
+      } else {
+        // For regular icons, add padding
+        const padding = size * 0.1;
+        const g = x.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2 - padding);
+        g.addColorStop(0,'#0f1625'); 
+        g.addColorStop(1,'#0b111b');
+        x.fillStyle = g; 
+        x.fillRect(padding, padding, size - padding*2, size - padding*2);
+      }
       
       // Enhanced neon ring with glow
-      const r = size*0.38; 
-      x.lineWidth = Math.max(4, size*0.04);
+      const r = size * (maskable ? 0.32 : 0.38); 
+      x.lineWidth = Math.max(3, size*0.035);
       const g2 = x.createLinearGradient(0,0,size,size);
       g2.addColorStop(0,'#53d7ff'); 
-      g2.addColorStop(.3,'#39ffb6'); 
-      g2.addColorStop(.7,'#a88bff');
+      g2.addColorStop(.25,'#39ffb6'); 
+      g2.addColorStop(.75,'#a88bff');
       g2.addColorStop(1,'#ff6b9d');
       
       // Glow effect
       x.shadowColor = '#53d7ff';
-      x.shadowBlur = size*0.08;
+      x.shadowBlur = size*0.06;
       x.strokeStyle = g2; 
       x.beginPath(); 
       x.arc(size/2,size/2,r,0,Math.PI*2); 
@@ -688,50 +790,83 @@
       x.shadowBlur = 0;
       
       // Enhanced text with better positioning
-      x.font = `900 ${Math.floor(size*0.32)}px Inter, Arial`;
+      x.font = `900 ${Math.floor(size*(maskable ? 0.28 : 0.32))}px Inter, Arial`;
       x.textAlign = 'center'; 
       x.textBaseline = 'middle';
       const g3 = x.createLinearGradient(0,0,size,size); 
       g3.addColorStop(0,'#53d7ff'); 
-      g3.addColorStop(.5,'#39ffb6');
-      g3.addColorStop(1,'#a88bff');
+      g3.addColorStop(.4,'#39ffb6');
+      g3.addColorStop(.8,'#a88bff');
+      g3.addColorStop(1,'#ff6b9d');
       x.fillStyle = g3; 
-      x.fillText('EB', size/2, size/2+size*0.015);
+      x.fillText('EB', size/2, size/2+size*0.012);
       
       return c.toDataURL('image/png');
     }
 
+    // Generate all required icon sizes
+    const icon16 = makeIcon(16);
     const icon32 = makeIcon(32);
+    const icon48 = makeIcon(48);
+    const icon72 = makeIcon(72);
+    const icon96 = makeIcon(96);
+    const icon128 = makeIcon(128);
+    const icon144 = makeIcon(144);
+    const icon152 = makeIcon(152);
     const icon180 = makeIcon(180);
     const icon192 = makeIcon(192);
+    const icon384 = makeIcon(384);
     const icon512 = makeIcon(512);
+    const icon192Maskable = makeIcon(192, true);
+    const icon512Maskable = makeIcon(512, true);
 
     // Enhanced favicon and apple touch icon
-    const fav = document.createElement('link'); 
-    fav.rel='icon'; 
-    fav.type='image/png'; 
-    fav.sizes='32x32'; 
-    fav.href=icon32; 
-    document.head.appendChild(fav);
+    const fav16 = document.createElement('link'); 
+    fav16.rel='icon'; fav16.type='image/png'; fav16.sizes='16x16'; fav16.href=icon16; 
+    document.head.appendChild(fav16);
+    
+    const fav32 = document.createElement('link'); 
+    fav32.rel='icon'; fav32.type='image/png'; fav32.sizes='32x32'; fav32.href=icon32; 
+    document.head.appendChild(fav32);
     
     const apt = document.createElement('link'); 
-    apt.rel='apple-touch-icon'; 
-    apt.sizes='180x180'; 
-    apt.href=icon180; 
+    apt.rel='apple-touch-icon'; apt.sizes='180x180'; apt.href=icon180; 
     document.head.appendChild(apt);
 
-    // Enhanced manifest
+    // Enhanced manifest with all required properties
     const manifest = {
-      name: 'EBassWave AI Hub', 
-      short_name: 'EBassWave', 
-      start_url: '.', 
-      display: 'standalone',
-      background_color: '#0b111b', 
-      theme_color: '#0b111b',
+      name: 'EBassWave AI Hub',
+      short_name: 'EBassWave',
       description: 'ศูนย์กลางงานของคุณในที่เดียว—ดีไซน์เรียบ สะอาด โมเดิร์น โทนนีออนล้ำสมัย',
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      orientation: 'portrait-primary',
+      background_color: '#0b111b',
+      theme_color: '#0b111b',
+      lang: 'th',
+      dir: 'ltr',
+      categories: ['productivity', 'utilities', 'business'],
+      screenshots: [
+        {
+          src: icon512,
+          sizes: '512x512',
+          type: 'image/png',
+          form_factor: 'narrow'
+        }
+      ],
       icons: [
-        { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-        { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+        { src: icon48, sizes: '48x48', type: 'image/png', purpose: 'any' },
+        { src: icon72, sizes: '72x72', type: 'image/png', purpose: 'any' },
+        { src: icon96, sizes: '96x96', type: 'image/png', purpose: 'any' },
+        { src: icon128, sizes: '128x128', type: 'image/png', purpose: 'any' },
+        { src: icon144, sizes: '144x144', type: 'image/png', purpose: 'any' },
+        { src: icon152, sizes: '152x152', type: 'image/png', purpose: 'any' },
+        { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: icon384, sizes: '384x384', type: 'image/png', purpose: 'any' },
+        { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any' },
+        { src: icon192Maskable, sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+        { src: icon512Maskable, sizes: '512x512', type: 'image/png', purpose: 'maskable' }
       ]
     };
     
@@ -741,23 +876,104 @@
     mlink.href = URL.createObjectURL(mblob); 
     document.head.appendChild(mlink);
 
-    // Enhanced service worker
+    // Enhanced service worker with caching
     if ('serviceWorker' in navigator){
       const swCode = `
-        self.addEventListener('install', e => self.skipWaiting()); 
-        self.addEventListener('activate', e => clients.claim());
-        self.addEventListener('fetch', e => {
-          if (e.request.destination === 'document') {
-            e.respondWith(fetch(e.request).catch(() => caches.match('/')));
-          }
+        const CACHE_NAME = 'ebasswave-v1';
+        const urlsToCache = [
+          '/',
+          '/index.html'
+        ];
+
+        self.addEventListener('install', event => {
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then(cache => cache.addAll(urlsToCache))
+              .then(() => self.skipWaiting())
+          );
+        });
+
+        self.addEventListener('activate', event => {
+          event.waitUntil(
+            caches.keys().then(cacheNames => {
+              return Promise.all(
+                cacheNames.map(cacheName => {
+                  if (cacheName !== CACHE_NAME) {
+                    return caches.delete(cacheName);
+                  }
+                })
+              );
+            }).then(() => self.clients.claim())
+          );
+        });
+
+        self.addEventListener('fetch', event => {
+          event.respondWith(
+            caches.match(event.request)
+              .then(response => {
+                if (response) {
+                  return response;
+                }
+                return fetch(event.request);
+              }
+            )
+          );
         });
       `;
+      
       const swBlob = new Blob([swCode], {type:'text/javascript'});
-      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob))
+        .then(registration => {
+          console.log('SW registered successfully');
+        })
+        .catch(error => {
+          console.log('SW registration failed');
+        });
+    }
+
+    // PWA Install functionality
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('beforeinstallprompt fired');
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install button
+      installContainer.classList.add('show');
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        deferredPrompt = null;
+        installContainer.classList.remove('show');
+      }
+    });
+
+    // Hide install button when app is installed
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA was installed');
+      installContainer.classList.remove('show');
+      deferredPrompt = null;
+    });
+
+    // Check if app is already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log('App is running in standalone mode');
+      installContainer.style.display = 'none';
     }
 
     // Smooth scroll for better UX
     document.documentElement.style.scrollBehavior = 'smooth';
+
+    // Performance monitoring
+    if ('performance' in window) {
+      window.addEventListener('load', () => {
+        const perfData = performance.getEntriesByType('navigation')[0];
+        console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
+      });
+    }
   </script>
 </body>
 </html>
