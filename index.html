@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EBassWave AI Hub</title>
+    <meta name="theme-color" content="#0b111b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EBassWave AI Hub"><title>EBassWave AI Hub</title>
   <meta name="color-scheme" content="dark">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -140,12 +144,49 @@
       .desc{ font-size:.92rem }
       a.card{ min-height: 118px }
     }
+  /* Touch-friendly & safe-area */
+    @media (hover: none){
+      .card:hover{ transform:none; box-shadow: var(--shadow); }
+      .card:hover::before{ opacity:.5 }
+      .arrow{ transform:none }
+    }
+    @supports (padding: max(0px)){
+      body{ padding-bottom:max(0px, env(safe-area-inset-bottom)); padding-top:max(0px, env(safe-area-inset-top)); }
+    }
+    .brand{ display:inline-flex; align-items:center; justify-content:center; width:76px; height:76px; margin:0 auto 14px; border-radius:20px; position:relative; }
+    .brand svg{ width:100%; height:100%; filter: drop-shadow(0 0 12px rgba(83,215,255,.35)) drop-shadow(0 0 20px rgba(168,139,255,.25)); }
+    @media (max-width:480px){
+      h1{ font-size: clamp(1.8rem, 8vw, 2.6rem) }
+      .grid{ grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px }
+      a.card{ min-height:112px; padding:16px; border-radius:14px }
+      .ico{ width:40px; height:40px; border-radius:10px }
+      .title{ font-size:1rem }
+      .desc{ font-size:.9rem }
+    }
   </style>
 </head>
 <body>
   <div class="mesh" aria-hidden="true"></div>
   <div class="wrap">
     <header>
+        <div class="brand" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#53d7ff"/>
+              <stop offset="50%" stop-color="#39ffb6"/>
+              <stop offset="100%" stop-color="#a88bff"/>
+            </linearGradient>
+          </defs>
+          <rect x="12" y="12" width="176" height="176" rx="36" fill="#0a1220" stroke="url(#g1)" stroke-width="6"/>
+          <g fill="none" stroke="url(#g1)" stroke-width="6" opacity=".65">
+            <path d="M40 100h120"/>
+            <path d="M70 70v60"/>
+            <path d="M130 60v80"/>
+          </g>
+          <text x="100" y="118" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="800" fill="url(#g1)">EB</text>
+        </svg>
+      </div>
       <span class="tag" aria-label="AI style tag"><i></i> Modern • AI • Tech</span>
       <h1 aria-label="EBassWave AI Hub">EBassWave AI Hub</h1>
       <p class="sub">ศูนย์กลางงานของคุณในที่เดียว—ดีไซน์เรียบ สะอาด โมเดิร์น โทนนีออนล้ำสมัย</p>
@@ -304,16 +345,68 @@
   </div>
 
   <script>
-    // Hover glow tracks mouse within each card
-    for (const card of document.querySelectorAll('.card')){
-      card.addEventListener('pointermove', (e)=>{
-        const r = card.getBoundingClientRect();
-        card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-        card.style.setProperty('--my', (e.clientY - r.top) + 'px');
-      }, {passive:true});
+    // Hover glow only on hover-capable devices
+    const canHover = matchMedia('(hover: hover)').matches;
+    if (canHover){
+      for (const card of document.querySelectorAll('.card')){
+        card.addEventListener('pointermove', (e)=>{
+          const r = card.getBoundingClientRect();
+          card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+          card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        }, {passive:true});
+      }
     }
+
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
+
+    // ---- PWA: generate icons + manifest on the fly (works without extra files) ----
+    function makeIcon(size){
+      const c = document.createElement('canvas'); c.width = c.height = size; const x = c.getContext('2d');
+      // background
+      const g = x.createLinearGradient(0,0,size,size);
+      g.addColorStop(0,'#0b111b'); g.addColorStop(1,'#0f1625');
+      x.fillStyle = g; x.fillRect(0,0,size,size);
+      // neon ring
+      const r = size*0.42; x.lineWidth = Math.max(6, size*0.06);
+      const g2 = x.createLinearGradient(0,0,size,size);
+      g2.addColorStop(0,'#53d7ff'); g2.addColorStop(.5,'#39ffb6'); g2.addColorStop(1,'#a88bff');
+      x.strokeStyle = g2; x.beginPath(); x.arc(size/2,size/2,r,0,Math.PI*2); x.stroke();
+      // text EB
+      x.font = `bold ${Math.floor(size*0.38)}px Inter, Arial`;
+      x.textAlign = 'center'; x.textBaseline = 'middle';
+      const g3 = x.createLinearGradient(0,0,size,size); g3.addColorStop(0,'#53d7ff'); g3.addColorStop(1,'#a88bff');
+      x.fillStyle = g3; x.fillText('EB', size/2, size/2+size*0.02);
+      return c.toDataURL('image/png');
+    }
+
+    const icon32 = makeIcon(32);
+    const icon180 = makeIcon(180);
+    const icon192 = makeIcon(192);
+    const icon512 = makeIcon(512);
+
+    // Favicon & Apple Touch Icon
+    const fav = document.createElement('link'); fav.rel='icon'; fav.type='image/png'; fav.sizes='32x32'; fav.href=icon32; document.head.appendChild(fav);
+    const apt = document.createElement('link'); apt.rel='apple-touch-icon'; apt.sizes='180x180'; apt.href=icon180; document.head.appendChild(apt);
+
+    // Manifest (standalone install)
+    const manifest = {
+      name: 'EBassWave AI Hub', short_name: 'EBassWave', start_url: '.', display: 'standalone',
+      background_color: '#0b111b', theme_color: '#0b111b',
+      icons: [
+        { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+        { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+      ]
+    };
+    const mblob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+    const mlink = document.createElement('link'); mlink.rel='manifest'; mlink.href = URL.createObjectURL(mblob); document.head.appendChild(mlink);
+
+    // Minimal service worker for installability (optional offline shell)
+    if ('serviceWorker' in navigator){
+      const swCode = `self.addEventListener('install', e=>self.skipWaiting()); self.addEventListener('activate', e=>clients.claim());`;
+      const swBlob = new Blob([swCode], {type:'text/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+    }
   </script>
 </body>
 </html>
