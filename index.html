@@ -138,19 +138,19 @@
       margin:0 auto; 
       padding: clamp(12px, 2.5vw, 24px);
       position: relative;
-      padding-top: calc(clamp(8px, 2vw, 18px) + env(safe-area-inset-top, 0));
+      padding-top: calc(clamp(16px, 3vw, 24px) + env(safe-area-inset-top, 0));
     }    
     
     header{
       text-align:center; 
-      padding: clamp(28px, 6vw, 56px) 0 clamp(18px, 3vw, 28px);
+      padding: clamp(16px, 3vw, 24px) 0 clamp(18px, 3vw, 28px);
       position:relative;
     }
 
     .brand{ 
       display:inline-flex; align-items:center; justify-content:center; 
-      width:72px; height:72px; margin:0 auto 12px; 
-      border-radius:18px; position:relative; overflow:hidden;
+      width:64px; height:64px; margin:0 auto 10px; 
+      border-radius:16px; position:relative; overflow:hidden;
       background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
       border: 1px solid var(--border-light);
       box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255,255,255,.06);
@@ -164,32 +164,32 @@
 
     .tag{
       display:inline-flex; align-items:center; gap:.5rem;
-      padding:.32rem .8rem; border:1px solid var(--border-light); border-radius:999px;
-      font-size:.82rem; font-weight: 500; color:var(--muted-light);
+      padding:.28rem .7rem; border:1px solid var(--border-light); border-radius:999px;
+      font-size:.8rem; font-weight: 500; color:var(--muted-light);
       background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(10,18,32,.95)); 
       backdrop-filter: blur(10px);
       box-shadow: 0 3px 10px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.08);
-      margin-bottom: .6rem;
+      margin-bottom: .5rem;
     }
     .tag i{ width:.6rem; height:.6rem; border-radius:50%; display:inline-block;
       background: radial-gradient(circle at 30% 30%, var(--cyan), var(--green) 70%); }
 
     h1{
-      margin:.5rem 0 0; font-weight:900; 
-      font-size:clamp(1.9rem, 5.8vw, 3.6rem); line-height:1.06; letter-spacing:.6px;
+      margin:.4rem 0 0; font-weight:900; 
+      font-size:clamp(1.8rem, 5.5vw, 3.2rem); line-height:1.08; letter-spacing:.6px;
       background: linear-gradient(135deg, var(--cyan) 0%, var(--green) 30%, var(--violet) 70%, var(--pink) 100%);
       -webkit-background-clip:text; background-clip:text; color:transparent;
       text-shadow: 0 0 30px rgba(83,215,255,.25);
     }
 
     .sub{
-      margin: .7rem auto 0; max-width: 560px; 
-      color:var(--ink-soft); font-size: clamp(.98rem, 1.6vw, 1.08rem);
-      line-height: 1.55; opacity: .92;
+      margin: .6rem auto 0; max-width: 560px; 
+      color:var(--ink-soft); font-size: clamp(.96rem, 1.5vw, 1.06rem);
+      line-height: 1.5; opacity: .92;
     }
 
     .grid{
-      margin-top: clamp(22px, 4vw, 36px);
+      margin-top: clamp(20px, 3.5vw, 32px);
       display:grid; gap: clamp(12px, 1.8vw, 18px);
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     }
@@ -267,7 +267,7 @@
     a.card:focus-visible{ outline: 2px solid var(--blue); outline-offset: 3px; transform: translateY(-4px) scale(1.005); }
 
     footer{ 
-      color:var(--muted); text-align:center; margin: 32px 0 16px; 
+      color:var(--muted); text-align:center; margin: 28px 0 16px; 
       font-size:.88rem; font-weight: 400; opacity: .85;
       padding-bottom: env(safe-area-inset-bottom, 16px);
     }
@@ -280,12 +280,13 @@
     @media (max-width:768px){
       .mesh::before,.mesh::after{ filter: blur(36px); opacity: .14; }
       .grid{ grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
-      .brand{ width:66px; height:66px; }
+      .brand{ width:60px; height:60px; }
       .install-container { bottom: 12px; right: 12px; }
+      header{ padding: clamp(12px, 2.5vw, 18px) 0 clamp(16px, 2.5vw, 22px); }
     }
     
     @media (max-width:480px){
-      h1{ font-size: clamp(1.7rem, 7.4vw, 2.4rem) }
+      h1{ font-size: clamp(1.6rem, 7vw, 2.2rem) }
       .grid{ grid-template-columns: 1fr; gap: 12px }
       a.card{ min-height:92px; padding:14px; border-radius:14px }
       .ico{ width:42px; height:42px; border-radius:12px }
@@ -293,6 +294,8 @@
       .title{ font-size:.98rem }
       .desc{ font-size:.88rem }
       .arrow{ width:26px; height:26px; }
+      header{ padding: 10px 0 16px; }
+      .brand{ width:56px; height:56px; margin-bottom: 8px; }
     }
 
     @media (hover: none){
