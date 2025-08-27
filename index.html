@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -39,6 +39,8 @@
       --blue:#4c79ff;
       --orange:#ff8a4c;
       --pink:#ff6b9d;
+      --red:#ff5757;
+      --yellow:#ffd93d;
       --card:#0f1625aa;
       --card-solid:#0f1625;
       --border:#1f2a40;
@@ -63,6 +65,208 @@
       min-height: 100vh;
       letter-spacing:.3px;
       overflow-x: hidden;
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--bg-0) 0%, var(--bg-1) 50%, var(--bg-2) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid var(--border);
+      border-top: 3px solid var(--cyan);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Floating Action Button */
+    .fab-container {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    .fab {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), var(--pink));
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(168,139,255,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 30px rgba(168,139,255,.4);
+    }
+
+    .fab svg {
+      width: 24px;
+      height: 24px;
+      fill: white;
+      transition: transform 0.3s ease;
+    }
+
+    .fab.active svg {
+      transform: rotate(45deg);
+    }
+
+    /* Quick Actions Menu */
+    .quick-actions {
+      position: absolute;
+      bottom: 70px;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .quick-actions.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
+
+    .quick-action {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--card-solid), var(--bg-2));
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .quick-action:hover {
+      transform: scale(1.1);
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(83,215,255,.3);
+    }
+
+    .quick-action svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--ink-soft);
+    }
+
+    /* Search Bar */
+    .search-container {
+      position: relative;
+      margin: 20px 0;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out 0.3s forwards;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 16px 50px 16px 20px;
+      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(11,17,27,.95));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: var(--ink);
+      font-size: 16px;
+      font-family: inherit;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(83,215,255,.2);
+    }
+
+    .search-box::placeholder {
+      color: var(--muted);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      stroke: var(--muted);
+    }
+
+    /* Stats Cards */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out 0.4s forwards;
+    }
+
+    .stat-card {
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      box-shadow: 0 8px 25px rgba(83,215,255,.15);
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 500;
     }
 
     /* Install Button Styles */
@@ -154,6 +358,7 @@
       background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
       border: 1px solid var(--border-light);
       box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255,255,255,.06);
+      animation: brandPulse 3s ease-in-out infinite;
     }
     .brand::before{
       content: ""; position: absolute; inset: -2px; border-radius: inherit;
@@ -161,6 +366,11 @@
       z-index: -1; opacity: .5; filter: blur(8px);
     }
     .brand img{ width:100%; height:100%; object-fit: cover; border-radius: inherit; }
+
+    @keyframes brandPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
 
     .tag{
       display:inline-flex; align-items:center; gap:.5rem;
@@ -170,9 +380,22 @@
       backdrop-filter: blur(10px);
       box-shadow: 0 3px 10px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.08);
       margin-bottom: .5rem;
+      animation: tagSlide 0.8s ease-out 0.2s both;
     }
     .tag i{ width:.6rem; height:.6rem; border-radius:50%; display:inline-block;
-      background: radial-gradient(circle at 30% 30%, var(--cyan), var(--green) 70%); }
+      background: radial-gradient(circle at 30% 30%, var(--cyan), var(--green) 70%); 
+      animation: tagGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes tagSlide {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes tagGlow {
+      0% { box-shadow: 0 0 5px rgba(83,215,255,.3); }
+      100% { box-shadow: 0 0 15px rgba(83,215,255,.6); }
+    }
 
     h1{
       margin:.4rem 0 0; font-weight:900; 
@@ -180,12 +403,70 @@
       background: linear-gradient(135deg, var(--cyan) 0%, var(--green) 30%, var(--violet) 70%, var(--pink) 100%);
       -webkit-background-clip:text; background-clip:text; color:transparent;
       text-shadow: 0 0 30px rgba(83,215,255,.25);
+      animation: titleGlow 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes titleGlow {
+      0% { filter: brightness(1); }
+      100% { filter: brightness(1.2); }
     }
 
     .sub{
       margin: .6rem auto 0; max-width: 560px; 
       color:var(--ink-soft); font-size: clamp(.96rem, 1.5vw, 1.06rem);
       line-height: 1.5; opacity: .92;
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    /* Time and Weather Widget */
+    .widget-container {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out 0.5s forwards;
+    }
+
+    .time-widget, .weather-widget {
+      flex: 1;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .time-widget:hover, .weather-widget:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      box-shadow: 0 8px 25px rgba(83,215,255,.15);
+    }
+
+    .time-display {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 4px;
+    }
+
+    .date-display {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .weather-display {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+
+    .weather-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
     }
 
     .grid{
@@ -207,6 +488,7 @@
       will-change: transform;
       transform: translateZ(0);
       animation: fadeInUp 0.48s ease-out forwards;
+      overflow: hidden;
     }
     .card:nth-child(1) { animation-delay: 0.08s; }
     .card:nth-child(2) { animation-delay: 0.12s; }
@@ -223,6 +505,22 @@
         color-mix(in oklab, var(--glow) 36%, transparent), transparent 70%);
       transition: opacity .25s ease; opacity:0;
     }
+
+    a.card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .card:hover::after {
+      left: 100%;
+    }
+
     .card:hover{ 
       transform: translateY(-6px) scale(1.01); 
       border-color: color-mix(in oklab, var(--glow) 45%, var(--border));
@@ -241,8 +539,17 @@
                   0 0 18px color-mix(in oklab, var(--glow) 22%, transparent),
                   0 3px 7px rgba(0,0,0,.2);
       position: relative;
+      transition: all 0.3s ease;
     }
-    .ico svg{ width:22px; height:22px; stroke: var(--ink); opacity:.95; }
+    .ico svg{ width:22px; height:22px; stroke: var(--ink); opacity:.95; transition: all 0.3s ease; }
+
+    .card:hover .ico {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .card:hover .ico svg {
+      stroke: var(--glow);
+    }
 
     .title{ font-weight:700; font-size: 1.02rem; letter-spacing:.25px; margin-top:6px; color: var(--ink); }
     .desc{ color:var(--muted-light); font-size:.9rem; margin-top: 3px; line-height: 1.35; }
@@ -266,15 +573,73 @@
 
     a.card:focus-visible{ outline: 2px solid var(--blue); outline-offset: 3px; transform: translateY(-4px) scale(1.005); }
 
+    /* Notification Toast */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+      color: var(--bg-0);
+      border-radius: 12px;
+      font-weight: 600;
+      box-shadow: 0 8px 25px rgba(57,255,182,.3);
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      z-index: 1001;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    /* Scroll to Top Button */
+    .scroll-top {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 999;
+    }
+
+    .scroll-top.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scroll-top:hover {
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 8px 25px rgba(76,121,255,.3);
+    }
+
+    .scroll-top svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      stroke-width: 2;
+    }
+
     footer{ 
       color:var(--muted); text-align:center; margin: 28px 0 16px; 
       font-size:.88rem; font-weight: 400; opacity: .85;
       padding-bottom: env(safe-area-inset-bottom, 16px);
+      animation: fadeInUp 0.8s ease-out 0.6s both;
     }
 
     @media (prefers-reduced-motion: reduce){
       .mesh::before,.mesh::after{ animation:none }
-      .card, .arrow, .install-btn{ transition: none; animation: none; }
+      .card, .arrow, .install-btn, .brand, .tag i, h1{ transition: none; animation: none; }
     }
 
     @media (max-width:768px){
@@ -282,7 +647,11 @@
       .grid{ grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
       .brand{ width:60px; height:60px; }
       .install-container { bottom: 12px; right: 12px; }
+      .fab-container { bottom: 16px; left: 16px; }
+      .scroll-top { bottom: 80px; right: 16px; }
       header{ padding: clamp(12px, 2.5vw, 18px) 0 clamp(16px, 2.5vw, 22px); }
+      .widget-container { flex-direction: column; }
+      .stats-container { grid-template-columns: repeat(2, 1fr); }
     }
     
     @media (max-width:480px){
@@ -296,12 +665,16 @@
       .arrow{ width:26px; height:26px; }
       header{ padding: 10px 0 16px; }
       .brand{ width:56px; height:56px; margin-bottom: 8px; }
+      .fab { width: 52px; height: 52px; }
+      .quick-action { width: 44px; height: 44px; }
+      .toast { top: 16px; right: 16px; font-size: 0.9rem; }
     }
 
     @media (hover: none){
       .card:hover{ transform: translateY(-3px) scale(1.005); box-shadow: var(--shadow-lg); }
       .card:hover::before{ opacity:.45 }
       .card:hover .arrow{ transform: translateX(3px); }
+      .card:hover .ico { transform: scale(1.05); }
     }
     
     @supports (padding: max(0px)){
@@ -319,16 +692,47 @@
   </style>
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-spinner"></div>
+  </div>
+
   <!-- Status bar for PWA -->
   <div class="status-bar"></div>
   
+  <!-- Floating Action Button -->
+  <div class="fab-container">
+    <button class="fab" id="fabBtn">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </button>
+    <div class="quick-actions" id="quickActions">
+      <div class="quick-action" onclick="toggleTheme()" title="Toggle Theme">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </div>
+      <div class="quick-action" onclick="shareApp()" title="Share App">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </div>
+      <div class="quick-action" onclick="showInfo()" title="App Info">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+      </div>
+    </div>
+  </div>
+
   <!-- Install button -->
   <div class="install-container" id="installContainer">
     <button class="install-btn" id="installBtn">
       <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      ติดตั้งแอป
+      Install App
     </button>
   </div>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-top" id="scrollTopBtn">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M18 15l-6-6-6 6"/></svg>
+  </button>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
 
   <div class="mesh" aria-hidden="true"></div>
   <div class="wrap">
@@ -341,8 +745,49 @@
       <p class="sub">AI is Everything</p>
     </header>
 
-    <main class="grid" aria-label="Quick Links">
-      <a class="card" href="https://basssg.github.io/TAPro-DEV/" style="--glow: var(--cyan)" aria-label="TAPro">
+    <!-- Search Bar -->
+    <div class="search-container">
+      <input type="text" class="search-box" placeholder="Search applications..." id="searchBox">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-number" id="totalApps">8</div>
+        <div class="stat-label">Total Apps</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="activeUsers">1.2K</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="uptime">99.9%</div>
+        <div class="stat-label">Uptime</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="performance">A+</div>
+        <div class="stat-label">Performance</div>
+      </div>
+    </div>
+
+    <!-- Time and Weather Widgets -->
+    <div class="widget-container">
+      <div class="time-widget">
+        <div class="time-display" id="timeDisplay">--:--</div>
+        <div class="date-display" id="dateDisplay">Loading...</div>
+      </div>
+      <div class="weather-widget">
+        <div class="weather-display" id="weatherDisplay">--°C</div>
+        <div class="weather-desc" id="weatherDesc">Loading weather...</div>
+      </div>
+    </div>
+
+    <main class="grid" aria-label="Quick Links" id="appGrid">
+      <a class="card" href="https://basssg.github.io/TAPro-DEV/" style="--glow: var(--cyan)" aria-label="TAPro" data-name="TAPro">
         <div class="row">
           <div class="ico" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
@@ -353,7 +798,7 @@
           </div>
           <div class="spacer">
             <div class="title">TAPro</div>
-            <div class="desc">แพลตฟอร์มวิเคราะห์เทรดอัตโนมัติ</div>
+            <div class="desc">Automated Trading Analysis Platform</div>
           </div>
           <div class="arrow" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
@@ -361,7 +806,7 @@
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/TAProAlert-Dashboard/" style="--glow: var(--violet)" aria-label="Dashboard">
+      <a class="card" href="https://basssg.github.io/TAProAlert-Dashboard/" style="--glow: var(--violet)" aria-label="Dashboard" data-name="Dashboard">
         <div class="row">
           <div class="ico">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
@@ -371,7 +816,7 @@
           </div>
           <div class="spacer">
             <div class="title">Dashboard</div>
-            <div class="desc">สรุปตัวชี้วัดและสถานะระบบ</div>
+            <div class="desc">System Metrics & Status Overview</div>
           </div>
           <div class="arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
@@ -379,7 +824,7 @@
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/SnDForex/" style="--glow: var(--green)" aria-label="SnDFX">
+      <a class="card" href="https://basssg.github.io/SnDForex/" style="--glow: var(--green)" aria-label="SnDFX" data-name="SnDFX">
         <div class="row">
           <div class="ico">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
@@ -389,7 +834,7 @@
           </div>
           <div class="spacer">
             <div class="title">SnDFX</div>
-            <div class="desc">โซน Supply/Demand</div>
+            <div class="desc">Supply & Demand Zone Analysis</div>
           </div>
           <div class="arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
@@ -397,7 +842,7 @@
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/GoogleSheet/" style="--glow: var(--orange)" aria-label="GoogleSheet">
+      <a class="card" href="https://basssg.github.io/GoogleSheet/" style="--glow: var(--orange)" aria-label="GoogleSheet" data-name="GoogleSheet">
         <div class="row">
           <div class="ico">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
@@ -407,7 +852,7 @@
           </div>
           <div class="spacer">
             <div class="title">GoogleSheet</div>
-            <div class="desc">สเปรดชีตและสคริปต์เสริม</div>
+            <div class="desc">Enhanced Spreadsheet & Scripts</div>
           </div>
           <div class="arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
@@ -415,7 +860,7 @@
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/GoogleAppScript/" style="--glow: var(--pink)" aria-label="Google App Script">
+      <a class="card" href="https://basssg.github.io/GoogleAppScript/" style="--glow: var(--pink)" aria-label="Google App Script" data-name="Google App Script">
         <div class="row">
           <div class="ico">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
@@ -424,7 +869,7 @@
           </div>
           <div class="spacer">
             <div class="title">Google App Script</div>
-            <div class="desc">สคริปต์อัตโนมัติบน Google</div>
+            <div class="desc">Automated Google Scripts</div>
           </div>
           <div class="arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
@@ -432,7 +877,7 @@
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/Investment/" style="--glow: var(--blue)" aria-label="Investment">
+      <a class="card" href="https://basssg.github.io/Investment/" style="--glow: var(--blue)" aria-label="Investment" data-name="Investment">
         <div class="row">
           <div class="ico">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
@@ -442,7 +887,7 @@
           </div>
           <div class="spacer">
             <div class="title">Investment</div>
-            <div class="desc">ข้อมูลการลงทุนและพอร์ต</div>
+            <div class="desc">Portfolio & Investment Data</div>
           </div>
           <div class="arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
@@ -450,7 +895,7 @@
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/TripPlanner/" style="--glow: var(--green)" aria-label="TripPlanner">
+      <a class="card" href="https://basssg.github.io/TripPlanner/" style="--glow: var(--green)" aria-label="TripPlanner" data-name="TripPlanner">
         <div class="row">
           <div class="ico">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
@@ -460,7 +905,7 @@
           </div>
           <div class="spacer">
             <div class="title">TripPlanner</div>
-            <div class="desc">วางแผนการเดินทางอัจฉริยะ</div>
+            <div class="desc">Smart Travel Planning Assistant</div>
           </div>
           <div class="arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
@@ -468,7 +913,7 @@
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/Pickup/" style="--glow: var(--cyan)" aria-label="PickUp">
+      <a class="card" href="https://basssg.github.io/Pickup/" style="--glow: var(--cyan)" aria-label="PickUp" data-name="PickUp">
         <div class="row">
           <div class="ico">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
@@ -479,7 +924,7 @@
           </div>
           <div class="spacer">
             <div class="title">PickUp</div>
-            <div class="desc">ระบบนัดรับ/ขนส่งเรียลไทม์</div>
+            <div class="desc">Real-time Pickup & Delivery System</div>
           </div>
           <div class="arrow">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
@@ -497,6 +942,153 @@
     // ===================== ICON SOURCE (EXTERNAL) =====================
     const ICON_URL = "https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372";
     document.getElementById('brandImg').src = ICON_URL;
+
+    // ===================== LOADING SCREEN =====================
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loadingScreen').classList.add('hidden');
+      }, 1000);
+    });
+
+    // ===================== TIME & DATE =====================
+    function updateTime() {
+      const now = new Date();
+      const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
+      const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      
+      document.getElementById('timeDisplay').textContent = now.toLocaleTimeString('en-US', timeOptions);
+      document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', dateOptions);
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // ===================== WEATHER (MOCK DATA) =====================
+    function updateWeather() {
+      // Mock weather data - in real app, you'd fetch from weather API
+      const temperatures = [22, 25, 28, 24, 26, 23, 27];
+      const conditions = ['Sunny', 'Cloudy', 'Partly Cloudy', 'Clear', 'Overcast'];
+      
+      const temp = temperatures[Math.floor(Math.random() * temperatures.length)];
+      const condition = conditions[Math.floor(Math.random() * conditions.length)];
+      
+      document.getElementById('weatherDisplay').textContent = `${temp}°C`;
+      document.getElementById('weatherDesc').textContent = condition;
+    }
+
+    updateWeather();
+    setInterval(updateWeather, 300000); // Update every 5 minutes
+
+    // ===================== SEARCH FUNCTIONALITY =====================
+    const searchBox = document.getElementById('searchBox');
+    const appGrid = document.getElementById('appGrid');
+    const cards = appGrid.querySelectorAll('.card');
+
+    searchBox.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      
+      cards.forEach(card => {
+        const appName = card.getAttribute('data-name').toLowerCase();
+        const title = card.querySelector('.title').textContent.toLowerCase();
+        const desc = card.querySelector('.desc').textContent.toLowerCase();
+        
+        if (appName.includes(searchTerm) || title.includes(searchTerm) || desc.includes(searchTerm)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+
+    // ===================== FLOATING ACTION BUTTON =====================
+    const fabBtn = document.getElementById('fabBtn');
+    const quickActions = document.getElementById('quickActions');
+    let fabOpen = false;
+
+    fabBtn.addEventListener('click', () => {
+      fabOpen = !fabOpen;
+      fabBtn.classList.toggle('active', fabOpen);
+      quickActions.classList.toggle('show', fabOpen);
+    });
+
+    // ===================== QUICK ACTIONS =====================
+    function toggleTheme() {
+      showToast('Theme toggle feature coming soon!');
+    }
+
+    function shareApp() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'EBassWave AI Hub',
+          text: 'Check out this amazing AI Hub!',
+          url: window.location.href
+        });
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        showToast('Link copied to clipboard!');
+      }
+    }
+
+    function showInfo() {
+      showToast('EBassWave AI Hub v2.0 - Your productivity companion');
+    }
+
+    // ===================== TOAST NOTIFICATIONS =====================
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // ===================== SCROLL TO TOP =====================
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.classList.add('show');
+      } else {
+        scrollTopBtn.classList.remove('show');
+      }
+    });
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ===================== STATS ANIMATION =====================
+    function animateStats() {
+      const stats = [
+        { id: 'totalApps', target: 8, suffix: '' },
+        { id: 'activeUsers', target: 1200, suffix: 'K', divisor: 1000 },
+        { id: 'uptime', target: 99.9, suffix: '%' },
+        { id: 'performance', target: 'A+', suffix: '' }
+      ];
+
+      stats.forEach(stat => {
+        const element = document.getElementById(stat.id);
+        if (typeof stat.target === 'number') {
+          let current = 0;
+          const increment = stat.target / 50;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= stat.target) {
+              current = stat.target;
+              clearInterval(timer);
+            }
+            
+            let displayValue = stat.divisor ? (current / stat.divisor).toFixed(1) : Math.floor(current);
+            element.textContent = displayValue + stat.suffix;
+          }, 30);
+        }
+      });
+    }
+
+    // Start stats animation when page loads
+    setTimeout(animateStats, 1500);
 
     // Enhanced hover glow effect
     const canHover = matchMedia('(hover: hover)').matches;
@@ -575,14 +1167,14 @@
       const manifest = {
         name: 'EBassWave AI Hub',
         short_name: 'EBassWave',
-        description: 'ศูนย์กลางงานของคุณในที่เดียว—ดีไซน์เรียบ สะอาด โมเดิร์น โทนนีออนล้ำสมัย',
+        description: 'Your productivity hub in one place—clean, modern design with futuristic neon aesthetics',
         start_url: '/',
         scope: '/',
         display: 'standalone',
         orientation: 'portrait-primary',
         background_color: '#0b111b',
         theme_color: '#0b111b',
-        lang: 'th',
+        lang: 'en',
         dir: 'ltr',
         categories: ['productivity', 'utilities', 'business'],
         screenshots: [{ src: use(512), sizes: '512x512', type: 'image/png', form_factor: 'narrow' }],
@@ -609,7 +1201,7 @@
     // ===================== SERVICE WORKER =====================
     if ('serviceWorker' in navigator){
       const swCode = `
-        const CACHE_NAME = 'ebasswave-v1';
+        const CACHE_NAME = 'ebasswave-v2';
         const urlsToCache = ['/', '/index.html', '${ICON_URL}'];
 
         self.addEventListener('install', event => {
@@ -665,6 +1257,7 @@
       console.log('PWA was installed');
       installContainer.classList.remove('show');
       deferredPrompt = null;
+      showToast('App installed successfully!');
     });
 
     if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -681,6 +1274,11 @@
         if (perfData) console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
       });
     }
+
+    // Welcome message
+    setTimeout(() => {
+      showToast('Welcome to EBassWave AI Hub!');
+    }, 2000);
   </script>
 </body>
 </html>
