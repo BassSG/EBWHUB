@@ -1008,27 +1008,6 @@
     // Update weather every 10 minutes
     setInterval(updateBangkokWeatherFallback, 600000);
 
-    // ===================== SEARCH FUNCTIONALITY =====================
-    const searchBox = document.getElementById('searchBox');
-    const appGrid = document.getElementById('appGrid');
-    const cards = appGrid.querySelectorAll('.card');
-
-    searchBox.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      
-      cards.forEach(card => {
-        const appName = card.getAttribute('data-name').toLowerCase();
-        const title = card.querySelector('.title').textContent.toLowerCase();
-        const desc = card.querySelector('.desc').textContent.toLowerCase();
-        
-        if (appName.includes(searchTerm) || title.includes(searchTerm) || desc.includes(searchTerm)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
-
     // ===================== FLOATING ACTION BUTTON =====================
     const fabBtn = document.getElementById('fabBtn');
     const quickActions = document.getElementById('quickActions');
@@ -1248,7 +1227,7 @@
     // ===================== SERVICE WORKER =====================
     if ('serviceWorker' in navigator){
       const swCode = `
-        const CACHE_NAME = 'ebasswave-v2';
+        const CACHE_NAME = 'ebasswave-v3';
         const urlsToCache = ['/', '/index.html', '${ICON_URL}'];
 
         self.addEventListener('install', event => {
