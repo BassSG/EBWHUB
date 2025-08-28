@@ -20,6 +20,19 @@
   
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Favicon & Touch Icons (static: load before JS) -->
+  <link rel="icon" type="image/png" sizes="32x32"
+        href="https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372">
+  <link rel="icon" type="image/png" sizes="16x16"
+        href="https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372">
+  <link rel="shortcut icon"
+        href="https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372">
+  <link rel="apple-touch-icon" sizes="180x180"
+        href="https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372">
+  <meta name="msapplication-TileImage"
+        content="https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372">
+
   
   <!-- PWA Manifest -->
   <link rel="manifest" href="#" id="manifest-placeholder">
@@ -1271,7 +1284,9 @@
           { src: use(180), sizes: '180x180',type: 'image/png', purpose: 'any' },
           { src: use(192), sizes: '192x192',type: 'image/png', purpose: 'any' },
           { src: use(384), sizes: '384x384',type: 'image/png', purpose: 'any' },
-          { src: use(512), sizes: '512x512',type: 'image/png', purpose: 'any' }
+          { src: use(512), sizes: '512x512',type: 'image/png', purpose: 'any' },
+          { src: use(192), sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: use(512), sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       };
       const mblob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
