@@ -8,16 +8,20 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="EBassWave AI Hub">
-  
+
   <!-- PWA Meta Tags -->
   <meta name="application-name" content="EBassWave AI Hub">
   <meta name="msapplication-TileColor" content="#0b111b">
   <meta name="msapplication-config" content="browserconfig.xml">
-  
+
   <title>EBassWave AI Hub</title>
   <meta name="description" content="AI isn't everything. But it's everything.">
   <meta name="color-scheme" content="dark">
-  
+
+  <!-- Perf: preconnect/dns-prefetch to app host -->
+  <link rel="preconnect" href="https://basssg.github.io" crossorigin>
+  <link rel="dns-prefetch" href="//basssg.github.io">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
@@ -33,10 +37,9 @@
   <meta name="msapplication-TileImage"
         content="https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372">
 
-  
   <!-- PWA Manifest -->
   <link rel="manifest" href="#" id="manifest-placeholder">
-  
+
   <style>
     :root{
       --bg-0:#070b12;
@@ -62,15 +65,15 @@
       --shadow-lg: 0 20px 40px rgba(0,0,0,.4), 0 8px 16px rgba(0,0,0,.3);
       --glow-soft: 0 0 20px rgba(83,215,255,.15);
     }
-    
+
     *{box-sizing:border-box}
     html,body{height:100%}
-    
+
     body{
-      margin:0; 
+      margin:0;
       font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      color:var(--ink); 
-      background: 
+      color:var(--ink);
+      background:
         radial-gradient(1200px 600px at 15% -5%, rgba(83,215,255,.07) 0%, transparent 50%),
         radial-gradient(1000px 500px at 85% 10%, rgba(168,139,255,.05) 0%, transparent 50%),
         radial-gradient(700px 350px at 50% 80%, rgba(57,255,182,.035) 0%, transparent 50%),
@@ -91,361 +94,146 @@
       z-index: 9999;
       transition: opacity 0.5s ease, visibility 0.5s ease;
     }
-
-    .loading-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-    }
-
+    .loading-screen.hidden { opacity: 0; visibility: hidden; }
     .loading-spinner {
-      width: 60px;
-      height: 60px;
-      border: 3px solid var(--border);
-      border-top: 3px solid var(--cyan);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+      width: 60px; height: 60px; border: 3px solid var(--border); border-top: 3px solid var(--cyan);
+      border-radius: 50%; animation: spin 1s linear infinite;
     }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 
     /* Floating Action Button */
-    .fab-container {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 1000;
-    }
-
+    .fab-container { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
     .fab {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
+      width: 56px; height: 56px; border-radius: 50%;
       background: linear-gradient(135deg, var(--violet), var(--pink));
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(168,139,255,.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(168,139,255,.3);
+      display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; position: relative; overflow: hidden;
     }
-
-    .fab:hover {
-      transform: scale(1.1);
-      box-shadow: 0 12px 30px rgba(168,139,255,.4);
-    }
-
-    .fab svg {
-      width: 24px;
-      height: 24px;
-      fill: white;
-      transition: transform 0.3s ease;
-    }
-
-    .fab.active svg {
-      transform: rotate(45deg);
-    }
+    .fab:hover { transform: scale(1.1); box-shadow: 0 12px 30px rgba(168,139,255,.4); }
+    .fab svg { width: 24px; height: 24px; fill: white; transition: transform 0.3s ease; }
+    .fab.active svg { transform: rotate(45deg); }
 
     /* Quick Actions Menu */
     .quick-actions {
-      position: absolute;
-      bottom: 70px;
-      left: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-      pointer-events: none;
+      position: absolute; bottom: 70px; left: 0; display: flex; flex-direction: column; gap: 12px;
+      opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: none;
     }
-
-    .quick-actions.show {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: all;
-    }
-
+    .quick-actions.show { opacity: 1; transform: translateY(0); pointer-events: all; }
     .quick-action {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
+      width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, var(--card-solid), var(--bg-2));
       border: 1px solid var(--border-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);
     }
+    .quick-action:hover { transform: scale(1.1); border-color: var(--cyan); box-shadow: 0 0 20px rgba(83,215,255,.3); }
+    .quick-action svg { width: 20px; height: 20px; stroke: var(--ink-soft); }
 
-    .quick-action:hover {
-      transform: scale(1.1);
-      border-color: var(--cyan);
-      box-shadow: 0 0 20px rgba(83,215,255,.3);
-    }
-
-    .quick-action svg {
-      width: 20px;
-      height: 20px;
-      stroke: var(--ink-soft);
-    }
-    
     /* Stats Cards */
     .stats-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin: 20px 0;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.6s ease-out 0.4s forwards;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px; margin: 20px 0; opacity: 0; transform: translateY(20px); animation: fadeInUp 0.6s ease-out 0.4s forwards;
     }
-
     .stat-card {
-      padding: 16px;
-      background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      text-align: center;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
+      padding: 16px; background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
+      border: 1px solid var(--border); border-radius: 12px; text-align: center; backdrop-filter: blur(10px); transition: all 0.3s ease;
     }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--cyan);
-      box-shadow: 0 8px 25px rgba(83,215,255,.15);
-    }
-
-    .stat-number {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 4px;
-    }
-
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-weight: 500;
-    }
+    .stat-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 8px 25px rgba(83,215,255,.15); }
+    .stat-number { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 4px; }
+    .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
 
     /* Install Button Styles */
-    .install-container {
-      position: fixed;
-      bottom: 14px;
-      right: 14px;
-      z-index: 1000;
-      opacity: 0;
-      transform: translateY(60px);
-      transition: all 0.25s ease;
-    }
-
-    .install-container.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
+    .install-container { position: fixed; bottom: 14px; right: 14px; z-index: 1000; opacity: 0; transform: translateY(60px); transition: all 0.25s ease; }
+    .install-container.show { opacity: 1; transform: translateY(0); }
     .install-btn {
-      background: linear-gradient(135deg, var(--cyan), var(--green));
-      border: none;
-      border-radius: 999px;
-      padding: 10px 16px;
-      color: var(--bg-0);
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(83,215,255,.28);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.25s ease;
-      font-family: inherit;
+      background: linear-gradient(135deg, var(--cyan), var(--green)); border: none; border-radius: 999px; padding: 10px 16px;
+      color: var(--bg-0); font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 8px 20px rgba(83,215,255,.28);
+      display: flex; align-items: center; gap: 8px; transition: all 0.25s ease; font-family: inherit;
     }
-
     .install-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
     /* Status Bar for PWA */
-    .status-bar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: env(safe-area-inset-top, 0);
-      background: var(--bg-0);
-      z-index: 1000;
-    }
+    .status-bar { position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0); background: var(--bg-0); z-index: 1000; }
 
     /* Background mesh */
     .mesh{ position: fixed; inset:0; pointer-events:none; z-index: -1; }
     .mesh::before,.mesh::after{
-      content: ""; position: absolute; inset:0;
-      filter: blur(48px); opacity: .18;
+      content: ""; position: absolute; inset:0; filter: blur(48px); opacity: .18;
       background:
         radial-gradient(circle at 25% 30%, rgba(83,215,255,.38), transparent 50%),
         radial-gradient(circle at 75% 70%, rgba(168,139,255,.3), transparent 50%),
         radial-gradient(circle at 50% 10%, rgba(57,255,182,.26), transparent 50%);
       animation: float 22s ease-in-out infinite alternate;
     }
-    .mesh::after{ 
-      animation: float 30s ease-in-out infinite alternate-reverse; 
-      mix-blend-mode: screen; opacity: .12;
+    .mesh::after{
+      animation: float 30s ease-in-out infinite alternate-reverse; mix-blend-mode: screen; opacity: .12;
       background:
         radial-gradient(circle at 80% 20%, rgba(255,138,76,.22), transparent 60%),
         radial-gradient(circle at 20% 80%, rgba(255,107,157,.18), transparent 60%);
     }
-    @keyframes float{
-      0%{transform:translate3d(-2%, -1%, 0) scale(1.01)}
-      50%{transform:translate3d(1%, 1%, 0) scale(1.05)}
-      100%{transform:translate3d(2%, 1%, 0) scale(1.02)}
-    }
+    @keyframes float{ 0%{transform:translate3d(-2%,-1%,0) scale(1.01)} 50%{transform:translate3d(1%,1%,0) scale(1.05)} 100%{transform:translate3d(2%,1%,0) scale(1.02)} }
 
-    .wrap{
-      max-width:1120px; 
-      margin:0 auto; 
-      padding: clamp(12px, 2.5vw, 24px);
-      position: relative;
-      padding-top: calc(clamp(16px, 3vw, 24px) + env(safe-area-inset-top, 0));
-    }    
-    
-    header{
-      text-align:center; 
-      padding: clamp(16px, 3vw, 24px) 0 clamp(18px, 3vw, 28px);
-      position:relative;
-    }
+    .wrap{ max-width:1120px; margin:0 auto; padding: clamp(12px, 2.5vw, 24px); position: relative;
+      padding-top: calc(clamp(16px, 3vw, 24px) + env(safe-area-inset-top, 0)); }
 
-    .brand{ 
-      display:inline-flex; align-items:center; justify-content:center; 
-      width:64px; height:64px; margin:0 auto 10px; 
-      border-radius:16px; position:relative; overflow:hidden;
+    header{ text-align:center; padding: clamp(16px, 3vw, 24px) 0 clamp(18px, 3vw, 28px); position:relative; }
+    .brand{
+      display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; margin:0 auto 10px; border-radius:16px; position:relative; overflow:hidden;
       background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
-      border: 1px solid var(--border-light);
-      box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255,255,255,.06);
+      border: 1px solid var(--border-light); box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255,255,255,.06);
       animation: brandPulse 3s ease-in-out infinite;
     }
     .brand::before{
-      content: ""; position: absolute; inset: -2px; border-radius: inherit;
-      background: linear-gradient(135deg, var(--cyan), var(--green), var(--violet));
+      content: ""; position: absolute; inset: -2px; border-radius: inherit; background: linear-gradient(135deg, var(--cyan), var(--green), var(--violet));
       z-index: -1; opacity: .5; filter: blur(8px);
     }
     .brand img{ width:100%; height:100%; object-fit: cover; border-radius: inherit; }
-
-    @keyframes brandPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
+    @keyframes brandPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
 
     .tag{
-      display:inline-flex; align-items:center; gap:.5rem;
-      padding:.28rem .7rem; border:1px solid var(--border-light); border-radius:999px;
+      display:inline-flex; align-items:center; gap:.5rem; padding:.28rem .7rem; border:1px solid var(--border-light); border-radius:999px;
       font-size:.8rem; font-weight: 500; color:var(--muted-light);
-      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(10,18,32,.95)); 
+      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(10,18,32,.95));
       backdrop-filter: blur(10px);
       box-shadow: 0 3px 10px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.08);
-      margin-bottom: .5rem;
-      animation: tagSlide 0.8s ease-out 0.2s both;
+      margin-bottom: .5rem; animation: tagSlide 0.8s ease-out 0.2s both;
     }
     .tag i{ width:.6rem; height:.6rem; border-radius:50%; display:inline-block;
-      background: radial-gradient(circle at 30% 30%, var(--cyan), var(--green) 70%); 
+      background: radial-gradient(circle at 30% 30%, var(--cyan), var(--green) 70%);
       animation: tagGlow 2s ease-in-out infinite alternate;
     }
-
-    @keyframes tagSlide {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes tagGlow {
-      0% { box-shadow: 0 0 5px rgba(83,215,255,.3); }
-      100% { box-shadow: 0 0 15px rgba(83,215,255,.6); }
-    }
+    @keyframes tagSlide { from{opacity:0; transform:translateY(-20px)} to{opacity:1; transform:translateY(0)} }
+    @keyframes tagGlow { 0%{box-shadow:0 0 5px rgba(83,215,255,.3)} 100%{box-shadow:0 0 15px rgba(83,215,255,.6)} }
 
     h1{
-      margin:.4rem 0 0; font-weight:900; 
-      font-size:clamp(1.8rem, 5.5vw, 3.2rem); line-height:1.08; letter-spacing:.6px;
+      margin:.4rem 0 0; font-weight:900; font-size:clamp(1.8rem, 5.5vw, 3.2rem); line-height:1.08; letter-spacing:.6px;
       background: linear-gradient(135deg, var(--cyan) 0%, var(--green) 30%, var(--violet) 70%, var(--pink) 100%);
       -webkit-background-clip:text; background-clip:text; color:transparent;
-      text-shadow: 0 0 30px rgba(83,215,255,.25);
-      animation: titleGlow 4s ease-in-out infinite alternate;
+      text-shadow: 0 0 30px rgba(83,215,255,.25); animation: titleGlow 4s ease-in-out infinite alternate;
     }
+    @keyframes titleGlow { 0% { filter: brightness(1); } 100% { filter: brightness(1.2); } }
 
-    @keyframes titleGlow {
-      0% { filter: brightness(1); }
-      100% { filter: brightness(1.2); }
-    }
-
-    .sub{
-      margin: .6rem auto 0; max-width: 560px; 
-      color:var(--ink-soft); font-size: clamp(.96rem, 1.5vw, 1.06rem);
-      line-height: 1.5; opacity: .92;
-      animation: fadeInUp 0.8s ease-out 0.4s both;
-    }
+    .sub{ margin: .6rem auto 0; max-width: 560px; color:var(--ink-soft); font-size: clamp(.96rem, 1.5vw, 1.06rem);
+      line-height: 1.5; opacity: .92; animation: fadeInUp 0.8s ease-out 0.4s both; }
 
     /* Time and Weather Widget */
-    .widget-container {
-      display: flex;
-      gap: 12px;
-      margin: 20px 0;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.6s ease-out 0.5s forwards;
-    }
-
+    .widget-container { display: flex; gap: 12px; margin: 20px 0; opacity: 0; transform: translateY(20px); animation: fadeInUp 0.6s ease-out 0.5s forwards; }
     .time-widget, .weather-widget {
-      flex: 1;
-      padding: 16px;
-      background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      text-align: center;
-      transition: all 0.3s ease;
+      flex: 1; padding: 16px; background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
+      border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); text-align: center; transition: all 0.3s ease;
     }
-
-    .time-widget:hover, .weather-widget:hover {
-      transform: translateY(-2px);
-      border-color: var(--cyan);
-      box-shadow: 0 8px 25px rgba(83,215,255,.15);
-    }
-
-    .time-display {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--cyan);
-      margin-bottom: 4px;
-    }
-
-    .date-display {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .weather-display {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--green);
-      margin-bottom: 4px;
-    }
-
-    .weather-desc {
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
+    .time-widget:hover, .weather-widget:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 8px 25px rgba(83,215,255,.15); }
+    .time-display { font-size: 1.5rem; font-weight: 700; color: var(--cyan); margin-bottom: 4px; }
+    .date-display { font-size: 0.9rem; color: var(--muted); }
+    .weather-display { font-size: 1.2rem; font-weight: 600; color: var(--green); margin-bottom: 4px; }
+    .weather-desc { font-size: 0.8rem; color: var(--muted); }
 
     .grid{
       margin-top: clamp(20px, 3.5vw, 32px);
       display:grid; gap: clamp(12px, 1.8vw, 18px);
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     }
-    
+
     a.card{
       display: flex; padding: clamp(14px, 2vw, 18px);
       border-radius: 16px;
@@ -456,71 +244,48 @@
       backdrop-filter: blur(10px);
       box-shadow: 0 3px 10px rgba(0,0,0,.14);
       min-height: 96px;
-      will-change: transform;
-      transform: translateZ(0);
-      animation: fadeInUp 0.48s ease-out forwards;
-      overflow: hidden;
+      will-change: transform; transform: translateZ(0);
+      animation: fadeInUp 0.48s ease-out forwards; overflow: hidden;
     }
-    .card:nth-child(1) { animation-delay: 0.08s; }
-    .card:nth-child(2) { animation-delay: 0.12s; }
-    .card:nth-child(3) { animation-delay: 0.16s; }
-    .card:nth-child(4) { animation-delay: 0.20s; }
-    .card:nth-child(5) { animation-delay: 0.24s; }
-    .card:nth-child(6) { animation-delay: 0.28s; }
-    .card:nth-child(7) { animation-delay: 0.32s; }
-    .card:nth-child(8) { animation-delay: 0.36s; }
+    .card:nth-child(1){ animation-delay: .08s } .card:nth-child(2){ animation-delay: .12s }
+    .card:nth-child(3){ animation-delay: .16s } .card:nth-child(4){ animation-delay: .20s }
+    .card:nth-child(5){ animation-delay: .24s } .card:nth-child(6){ animation-delay: .28s }
+    .card:nth-child(7){ animation-delay: .32s } .card:nth-child(8){ animation-delay: .36s } .card:nth-child(9){ animation-delay: .40s }
 
     a.card::before{
       content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none; z-index:-1;
-      background: radial-gradient(240px 240px at var(--mx,50%) var(--my,50%), 
+      background: radial-gradient(240px 240px at var(--mx,50%) var(--my,50%),
         color-mix(in oklab, var(--glow) 36%, transparent), transparent 70%);
       transition: opacity .25s ease; opacity:0;
     }
-
     a.card::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
+      content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
       transition: left 0.5s ease;
     }
+    .card:hover::after { left: 100%; }
 
-    .card:hover::after {
-      left: 100%;
-    }
-
-    .card:hover{ 
-      transform: translateY(-6px) scale(1.01); 
+    .card:hover{
+      transform: translateY(-6px) scale(1.01);
       border-color: color-mix(in oklab, var(--glow) 45%, var(--border));
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--glow) 26%, transparent), 
-                  0 16px 38px color-mix(in oklab, var(--glow) 16%, rgba(0,0,0,.28)), 
-                  var(--shadow-lg);
+      box-shadow: 0 0 0 1px color-mix(in oklab, var(--glow) 26%, transparent),
+                  0 16px 38px color-mix(in oklab, var(--glow) 16%, rgba(0,0,0,.28)), var(--shadow-lg);
     }
     .card:hover::before{ opacity:.7 }
 
     .ico{
       width:46px; height:46px; border-radius:14px; display:grid; place-items:center;
-      background: linear-gradient(135deg, 
-        color-mix(in oklab, var(--glow) 25%, rgba(15,22,37,.9)), 
+      background: linear-gradient(135deg,
+        color-mix(in oklab, var(--glow) 25%, rgba(15,22,37,.9)),
         color-mix(in oklab, var(--glow) 15%, rgba(10,18,32,.95)));
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--glow) 38%, rgba(255,255,255,.1)), 
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--glow) 38%, rgba(255,255,255,.1)),
                   0 0 18px color-mix(in oklab, var(--glow) 22%, transparent),
                   0 3px 7px rgba(0,0,0,.2);
-      position: relative;
-      transition: all 0.3s ease;
+      position: relative; transition: all 0.3s ease;
     }
     .ico svg{ width:22px; height:22px; stroke: var(--ink); opacity:.95; transition: all 0.3s ease; }
-
-    .card:hover .ico {
-      transform: scale(1.1) rotate(5deg);
-    }
-
-    .card:hover .ico svg {
-      stroke: var(--glow);
-    }
+    .card:hover .ico { transform: scale(1.1) rotate(5deg); }
+    .card:hover .ico svg { stroke: var(--glow); }
 
     .title{ font-weight:700; font-size: 1.02rem; letter-spacing:.25px; margin-top:6px; color: var(--ink); }
     .desc{ color:var(--muted-light); font-size:.9rem; margin-top: 3px; line-height: 1.35; }
@@ -538,81 +303,41 @@
       box-shadow: 0 0 12px color-mix(in oklab, var(--glow) 30%, transparent);
     }
     .arrow svg{ width: 14px; height: 14px; stroke: var(--ink-soft); stroke-width: 2; }
-    
+
     .row{ display:flex; align-items:center; gap:14px; width: 100%; }
     .spacer{ flex:1 }
-
     a.card:focus-visible{ outline: 2px solid var(--blue); outline-offset: 3px; transform: translateY(-4px) scale(1.005); }
 
     /* Notification Toast */
     .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 16px 20px;
+      position: fixed; top: 20px; right: 20px; padding: 16px 20px;
       background: linear-gradient(135deg, var(--green), var(--cyan));
-      color: var(--bg-0);
-      border-radius: 12px;
-      font-weight: 600;
-      box-shadow: 0 8px 25px rgba(57,255,182,.3);
-      transform: translateX(400px);
-      transition: transform 0.3s ease;
-      z-index: 1001;
+      color: var(--bg-0); border-radius: 12px; font-weight: 600;
+      box-shadow: 0 8px 25px rgba(57,255,182,.3); transform: translateX(400px);
+      transition: transform 0.3s ease; z-index: 1001;
     }
-
-    .toast.show {
-      transform: translateX(0);
-    }
+    .toast.show { transform: translateX(0); }
 
     /* Scroll to Top Button */
     .scroll-top {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
+      position: fixed; bottom: 90px; right: 20px; width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, var(--blue), var(--violet));
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-      z-index: 999;
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transform: translateY(20px); transition: all 0.3s ease; z-index: 999;
     }
+    .scroll-top.show { opacity: 1; transform: translateY(0); }
+    .scroll-top:hover { transform: translateY(-3px) scale(1.1); box-shadow: 0 8px 25px rgba(76,121,255,.3); }
+    .scroll-top svg { width: 20px; height: 20px; stroke: white; stroke-width: 2; }
 
-    .scroll-top.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .scroll-top:hover {
-      transform: translateY(-3px) scale(1.1);
-      box-shadow: 0 8px 25px rgba(76,121,255,.3);
-    }
-
-    .scroll-top svg {
-      width: 20px;
-      height: 20px;
-      stroke: white;
-      stroke-width: 2;
-    }
-
-    footer{ 
-      color:var(--muted); text-align:center; margin: 28px 0 16px; 
-      font-size:.88rem; font-weight: 400; opacity: .85;
-      padding-bottom: env(safe-area-inset-bottom, 16px);
-      animation: fadeInUp 0.8s ease-out 0.6s both;
+    footer{
+      color:var(--muted); text-align:center; margin: 28px 0 16px; font-size:.88rem; font-weight: 400; opacity: .85;
+      padding-bottom: env(safe-area-inset-bottom, 16px); animation: fadeInUp 0.8s ease-out 0.6s both;
     }
 
     @media (prefers-reduced-motion: reduce){
       .mesh::before,.mesh::after{ animation:none }
       .card, .arrow, .install-btn, .brand, .tag i, h1{ transition: none; animation: none; }
     }
-
     @media (max-width:768px){
       .mesh::before,.mesh::after{ filter: blur(36px); opacity: .14; }
       .grid{ grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
@@ -624,7 +349,6 @@
       .widget-container { flex-direction: column; }
       .stats-container { grid-template-columns: repeat(2, 1fr); }
     }
-    
     @media (max-width:480px){
       h1{ font-size: clamp(1.6rem, 7vw, 2.2rem) }
       .grid{ grid-template-columns: 1fr; gap: 12px }
@@ -640,37 +364,77 @@
       .quick-action { width: 44px; height: 44px; }
       .toast { top: 16px; right: 16px; font-size: 0.9rem; }
     }
-
     @media (hover: none){
       .card:hover{ transform: translateY(-3px) scale(1.005); box-shadow: var(--shadow-lg); }
       .card:hover::before{ opacity:.45 }
       .card:hover .arrow{ transform: translateX(3px); }
       .card:hover .ico { transform: scale(1.05); }
     }
-    
     @supports (padding: max(0px)){
-      body{ 
-        padding-bottom:max(16px, env(safe-area-inset-bottom)); 
-        padding-top:max(0px, env(safe-area-inset-top)); 
-      }
+      body{ padding-bottom:max(16px, env(safe-area-inset-bottom)); padding-top:max(0px, env(safe-area-inset-top)); }
     }
-
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* PWA Standalone mode styles */
-    @media (display-mode: standalone) { .status-bar { display: block; } .install-container { display: none; } }
-    @media (display-mode: browser) { .status-bar { display: none; } }
+    /* ================= In-App Viewer (Overlay) ================= */
+    .viewer {
+      position: fixed; inset: 0; display: none; grid-template-rows: auto 1fr;
+      background: linear-gradient(135deg, color-mix(in oklab, var(--bg-1) 88%, #000), rgba(0,0,0,.35));
+      backdrop-filter: blur(8px);
+      z-index: 1002;
+    }
+    .viewer.show { display: grid; }
+    .viewer-header{
+      display:flex; align-items:center; gap:10px;
+      padding: clamp(10px,2.2vw,14px);
+      background: linear-gradient(180deg, rgba(15,22,37, .92), rgba(11,17,27, .88));
+      border-bottom: 1px solid var(--border);
+    }
+    .viewer-app-ico{
+      width:32px; height:32px; border-radius:10px; display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(83,215,255,.18), rgba(168,139,255,.12));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .viewer-title{ font-weight:700; letter-spacing:.3px; }
+    .viewer-actions{ margin-left:auto; display:flex; gap:8px; }
+    .btn{
+      height:34px; padding:0 12px; border-radius:10px; display:inline-flex; align-items:center; gap:8px;
+      background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--border-light); color:var(--ink); cursor:pointer; font-weight:600;
+      transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease;
+      backdrop-filter: blur(8px);
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: var(--cyan); box-shadow: 0 6px 18px rgba(83,215,255,.18); }
+    .btn svg{ width:16px; height:16px; stroke: currentColor; }
+
+    .viewer-body{ position: relative; }
+    .viewer-iframe{
+      width:100%; height: calc(100dvh - 64px); border:0; background: #0b111b;
+    }
+    .viewer-loader{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;
+      background: linear-gradient(135deg, rgba(11,17,27,.55), rgba(15,22,37,.35)); opacity:0; transition: opacity .25s ease;
+    }
+    .viewer-loader.show{ opacity:1; }
+    .viewer-msg{
+      position:absolute; left:50%; top:18px; transform: translateX(-50%);
+      background: linear-gradient(135deg, rgba(255,87,87,.12), rgba(255,217,61,.10));
+      border:1px solid color-mix(in oklab, var(--yellow) 35%, rgba(255,255,255,.06));
+      padding:8px 12px; border-radius:10px; color: var(--ink-soft); font-size:.9rem; display:none;
+      backdrop-filter: blur(6px);
+    }
+    .viewer-msg.show{ display:block; }
+
+    /* Prevent body scroll when viewer open */
+    body.noscroll { overflow: hidden; }
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
-  <div class="loading-screen" id="loadingScreen">
-    <div class="loading-spinner"></div>
-  </div>
+  <div class="loading-screen" id="loadingScreen"><div class="loading-spinner"></div></div>
 
   <!-- Status bar for PWA -->
   <div class="status-bar"></div>
-  
+
   <!-- Floating Action Button -->
   <div class="fab-container">
     <button class="fab" id="fabBtn">
@@ -708,9 +472,7 @@
   <div class="mesh" aria-hidden="true"></div>
   <div class="wrap">
     <header>
-      <div class="brand" aria-hidden="true">
-        <img id="brandImg" alt="EBassWave Logo">
-      </div>
+      <div class="brand" aria-hidden="true"><img id="brandImg" alt="EBassWave Logo"></div>
       <span class="tag" aria-label="AI style tag"><i></i> Modern • AI • Tech</span>
       <h1 aria-label="EBassWave AI Hub">EBassWave AI Hub</h1>
       <p class="sub">AI is Everything</p>
@@ -734,179 +496,153 @@
         <div class="time-display" id="timeDisplay">--:--</div>
         <div class="date-display" id="dateDisplay">Loading...</div>
       </div>
+      <div class="weather-widget">
+        <div class="weather-display" id="weatherDisplay">--°C</div>
+        <div class="weather-desc" id="weatherDesc">Updating…</div>
+      </div>
     </div>
 
     <main class="grid" aria-label="Quick Links" id="appGrid">
-      <a class="card" href="https://basssg.github.io/TAPro-DEV/" style="--glow: var(--cyan)" aria-label="TAPro" data-name="TAPro">
+      <a class="card" href="https://basssg.github.io/TAPro-DEV/" style="--glow: var(--cyan)" aria-label="TAPro" data-name="TAPro" data-app="tapro">
         <div class="row">
           <div class="ico" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <path d="M3 3v18h18"/>
-              <path d="M6 16l3-3 3 2 5-7"/>
-              <circle cx="17" cy="7" r="1.2"/>
-            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M6 16l3-3 3 2 5-7"/><circle cx="17" cy="7" r="1.2"/></svg>
           </div>
           <div class="spacer">
             <div class="title">TAPro</div>
             <div class="desc">Automated Trading Analysis Platform</div>
           </div>
-          <div class="arrow" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
 
-      <!-- NEW: XAUUSD ( NEWS ) -->
-      <a class="card" href="https://basssg.github.io/XAUUSD-NEWS/" style="--glow: var(--yellow)" aria-label="XAUUSD ( NEWS )" data-name="XAUUSD ( NEWS )">
+      <!-- XAUUSD ( NEWS ) -->
+      <a class="card" href="https://basssg.github.io/XAUUSD-NEWS/" style="--glow: var(--yellow)" aria-label="XAUUSD ( NEWS )" data-name="XAUUSD ( NEWS )" data-app="xauusd-news">
         <div class="row">
           <div class="ico" aria-hidden="true">
-            <!-- newspaper icon -->
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <rect x="3" y="4" width="18" height="16" rx="2"/>
-              <path d="M7 8h6M7 12h10M7 16h10"/>
-            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h6M7 12h10M7 16h10"/></svg>
           </div>
           <div class="spacer">
             <div class="title">XAUUSD ( NEWS )</div>
             <div class="desc">ข่าวสารทุกอย่างเกี่ยวกับทองคำ</div>
           </div>
-          <div class="arrow" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/TAProAlert-Dashboard/" style="--glow: var(--violet)" aria-label="Dashboard" data-name="Dashboard">
+      <a class="card" href="https://basssg.github.io/TAProAlert-Dashboard/" style="--glow: var(--violet)" aria-label="Dashboard" data-name="Dashboard" data-app="dashboard">
         <div class="row">
-          <div class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <path d="M4 7h16M4 12h16M4 17h16"/>
-              <circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="7" cy="17" r="2"/>
-            </svg>
-          </div>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="7" cy="17" r="2"/></svg></div>
           <div class="spacer">
             <div class="title">Dashboard</div>
             <div class="desc">System Metrics & Status Overview</div>
           </div>
-          <div class="arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/SnDForex/" style="--glow: var(--green)" aria-label="SnDFX" data-name="SnDFX">
+      <a class="card" href="https://basssg.github.io/SnDForex/" style="--glow: var(--green)" aria-label="SnDFX" data-name="SnDFX" data-app="sndfx">
         <div class="row">
-          <div class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <path d="M4 20V10"/><path d="M10 20V6"/><path d="M16 20V13"/>
-              <path d="M3 20h18"/>
-            </svg>
-          </div>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M4 20V10"/><path d="M10 20V6"/><path d="M16 20V13"/><path d="M3 20h18"/></svg></div>
           <div class="spacer">
             <div class="title">SnDFX</div>
             <div class="desc">Supply & Demand Zone Analysis</div>
           </div>
-          <div class="arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/GoogleSheet/" style="--glow: var(--orange)" aria-label="GoogleSheet" data-name="GoogleSheet">
+      <a class="card" href="https://basssg.github.io/GoogleSheet/" style="--glow: var(--orange)" aria-label="GoogleSheet" data-name="GoogleSheet" data-app="googlesheet">
         <div class="row">
-          <div class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
-            </svg>
-          </div>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></div>
           <div class="spacer">
             <div class="title">GoogleSheet</div>
             <div class="desc">Enhanced Spreadsheet & Scripts</div>
           </div>
-          <div class="arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/GoogleAppScript/" style="--glow: var(--pink)" aria-label="Google App Script" data-name="Google App Script">
+      <a class="card" href="https://basssg.github.io/GoogleAppScript/" style="--glow: var(--pink)" aria-label="Google App Script" data-name="Google App Script" data-app="gas">
         <div class="row">
-          <div class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <path d="M9 7L5 12l4 5"/><path d="M15 7l4 5-4 5"/>
-            </svg>
-          </div>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 7L5 12l4 5"/><path d="M15 7l4 5-4 5"/></svg></div>
           <div class="spacer">
             <div class="title">Google App Script</div>
             <div class="desc">Automated Google Scripts</div>
           </div>
-          <div class="arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/Investment/" style="--glow: var(--blue)" aria-label="Investment" data-name="Investment">
+      <a class="card" href="https://basssg.github.io/Investment/" style="--glow: var(--blue)" aria-label="Investment" data-name="Investment" data-app="investment">
         <div class="row">
-          <div class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <path d="M3 3v18h18"/>
-              <path d="M6 16l4-4 3 2 5-7"/>
-            </svg>
-          </div>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M6 16l4-4 3 2 5-7"/></svg></div>
           <div class="spacer">
             <div class="title">Investment</div>
             <div class="desc">Portfolio & Investment Data</div>
           </div>
-          <div class="arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/TripPlanner/" style="--glow: var(--green)" aria-label="TripPlanner" data-name="TripPlanner">
+      <a class="card" href="https://basssg.github.io/TripPlanner/" style="--glow: var(--green)" aria-label="TripPlanner" data-name="TripPlanner" data-app="tripplanner">
         <div class="row">
-          <div class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z"/>
-              <circle cx="12" cy="10" r="2.5"/>
-            </svg>
-          </div>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
           <div class="spacer">
             <div class="title">TripPlanner</div>
             <div class="desc">Smart Travel Planning Assistant</div>
           </div>
-          <div class="arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
 
-      <a class="card" href="https://basssg.github.io/Pickup/" style="--glow: var(--cyan)" aria-label="PickUp" data-name="PickUp">
+      <a class="card" href="https://basssg.github.io/Pickup/" style="--glow: var(--cyan)" aria-label="PickUp" data-name="PickUp" data-app="pickup">
         <div class="row">
-          <div class="ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
-              <path d="M3 15h2l2-3h6l2 3h4"/>
-              <circle cx="7" cy="18" r="2"/>
-              <circle cx="17" cy="18" r="2"/>
-            </svg>
-          </div>
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 15h2l2-3h6l2 3h4"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></div>
           <div class="spacer">
             <div class="title">PickUp</div>
             <div class="desc">Real-time Pickup & Delivery System</div>
           </div>
-          <div class="arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
-          </div>
+          <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
         </div>
       </a>
     </main>
 
-    <footer>
-      © <span id="y"></span> EBassWave AI Hub • Built for speed, clarity, and control
-    </footer>
+    <footer>© <span id="y"></span> EBassWave AI Hub • Built for speed, clarity, and control</footer>
   </div>
+
+  <!-- ================= In-App Viewer Overlay ================= -->
+  <section class="viewer" id="viewer" aria-hidden="true">
+    <div class="viewer-header">
+      <div class="viewer-app-ico" id="viewerIco" aria-hidden="true"></div>
+      <div class="viewer-title" id="viewerTitle">Loading…</div>
+      <div class="viewer-actions">
+        <button class="btn" id="btnReload" title="Reload">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Reload
+        </button>
+        <button class="btn" id="btnFullscreen" title="Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+          Full
+        </button>
+        <button class="btn" id="btnExternal" title="Open in new tab">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v7h-7"/></svg>
+          New Tab
+        </button>
+        <button class="btn" id="btnClose" title="Close">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          Close
+        </button>
+      </div>
+    </div>
+    <div class="viewer-body">
+      <iframe id="appFrame" class="viewer-iframe" allowfullscreen
+              allow="fullscreen; clipboard-read; clipboard-write"
+              referrerpolicy="no-referrer"></iframe>
+      <div class="viewer-loader" id="viewerLoader"><div class="loading-spinner"></div></div>
+      <div class="viewer-msg" id="viewerMsg">This site may block embedding. Use “New Tab” if it doesn’t load.</div>
+    </div>
+  </section>
 
   <script>
     // ===================== ICON SOURCE (EXTERNAL) =====================
@@ -915,27 +651,19 @@
 
     // ===================== LOADING SCREEN =====================
     window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.getElementById('loadingScreen').classList.add('hidden');
-      }, 1000);
+      setTimeout(() => document.getElementById('loadingScreen').classList.add('hidden'), 1000);
     });
 
-    // ===================== SESSION TRACKING =====================
+    // ===================== SESSION TRACKING (guard if element missing) =====================
     let sessionStartTime = Date.now();
-    
     function updateSessionTime() {
+      const el = document.getElementById('sessionTime');
+      if (!el) return;
       const elapsed = Date.now() - sessionStartTime;
       const minutes = Math.floor(elapsed / 60000);
       const seconds = Math.floor((elapsed % 60000) / 1000);
-      
-      if (minutes > 0) {
-        document.getElementById('sessionTime').textContent = `${minutes}m`;
-      } else {
-        document.getElementById('sessionTime').textContent = `${seconds}s`;
-      }
+      el.textContent = minutes > 0 ? `${minutes}m` : `${seconds}s`;
     }
-
-    // Update session time every second
     setInterval(updateSessionTime, 1000);
 
     // ===================== TIME & DATE =====================
@@ -943,178 +671,98 @@
       const now = new Date();
       const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
       const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      
       document.getElementById('timeDisplay').textContent = now.toLocaleTimeString('en-US', timeOptions);
       document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', dateOptions);
     }
-
     updateTime();
     setInterval(updateTime, 1000);
 
-    // ===================== REAL WEATHER API (Bangkok) =====================
+    // ===================== WEATHER (with fallback) =====================
     async function fetchBangkokWeather() {
       try {
-        // Using OpenWeatherMap API (you'll need to get a free API key)
-        // For demo purposes, I'll use a public weather API
         const response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=Bangkok,TH&appid=YOUR_API_KEY&units=metric');
-        
-        if (!response.ok) {
-          throw new Error('Weather API not available');
-        }
-        
+        if (!response.ok) throw new Error('Weather API not available');
         const data = await response.json();
-        
-        document.getElementById('weatherDisplay').textContent = `${Math.round(data.main.temp)}°C`;
-        document.getElementById('weatherDesc').textContent = data.weather[0].description;
-        
+        const wd = document.getElementById('weatherDisplay');
+        const wc = document.getElementById('weatherDesc');
+        if (wd) wd.textContent = `${Math.round(data.main.temp)}°C`;
+        if (wc) wc.textContent = data.weather[0].description;
         showToast('Weather updated for Bangkok!');
-      } catch (error) {
-        // Fallback to realistic Bangkok weather simulation
-        updateBangkokWeatherFallback();
-      }
+      } catch (error) { updateBangkokWeatherFallback(); }
     }
-
     function updateBangkokWeatherFallback() {
-      // Bangkok typical weather patterns
       const hour = new Date().getHours();
       let temp, condition;
-      
-      // Bangkok weather simulation based on time and season
-      if (hour >= 6 && hour < 12) {
-        // Morning: 26-30°C
-        temp = Math.floor(Math.random() * 5) + 26;
-        condition = ['Partly Cloudy', 'Sunny', 'Hazy'][Math.floor(Math.random() * 3)];
-      } else if (hour >= 12 && hour < 18) {
-        // Afternoon: 30-35°C
-        temp = Math.floor(Math.random() * 6) + 30;
-        condition = ['Hot', 'Very Hot', 'Partly Cloudy', 'Thunderstorms'][Math.floor(Math.random() * 4)];
-      } else if (hour >= 18 && hour < 22) {
-        // Evening: 28-32°C
-        temp = Math.floor(Math.random() * 5) + 28;
-        condition = ['Partly Cloudy', 'Clear', 'Light Rain'][Math.floor(Math.random() * 3)];
-      } else {
-        // Night: 24-28°C
-        temp = Math.floor(Math.random() * 5) + 24;
-        condition = ['Clear', 'Partly Cloudy', 'Humid'][Math.floor(Math.random() * 3)];
-      }
-      
-      document.getElementById('weatherDisplay').textContent = `${temp}°C`;
-      document.getElementById('weatherDesc').textContent = condition;
+      if (hour >= 6 && hour < 12){ temp = Math.floor(Math.random()*5)+26; condition = ['Partly Cloudy','Sunny','Hazy'][Math.floor(Math.random()*3)]; }
+      else if (hour >= 12 && hour < 18){ temp = Math.floor(Math.random()*6)+30; condition = ['Hot','Very Hot','Partly Cloudy','Thunderstorms'][Math.floor(Math.random()*4)]; }
+      else if (hour >= 18 && hour < 22){ temp = Math.floor(Math.random()*5)+28; condition = ['Partly Cloudy','Clear','Light Rain'][Math.floor(Math.random()*3)]; }
+      else { temp = Math.floor(Math.random()*5)+24; condition = ['Clear','Partly Cloudy','Humid'][Math.floor(Math.random()*3)]; }
+      const wd = document.getElementById('weatherDisplay');
+      const wc = document.getElementById('weatherDesc');
+      if (wd) wd.textContent = `${temp}°C`;
+      if (wc) wc.textContent = condition;
     }
-
-    // Initial weather load
     updateBangkokWeatherFallback();
-
-    // Update weather every 10 minutes
     setInterval(updateBangkokWeatherFallback, 600000);
 
-    // ===================== FLOATING ACTION BUTTON =====================
+    // ===================== FAB =====================
     const fabBtn = document.getElementById('fabBtn');
     const quickActions = document.getElementById('quickActions');
     let fabOpen = false;
-
     fabBtn.addEventListener('click', () => {
       fabOpen = !fabOpen;
       fabBtn.classList.toggle('active', fabOpen);
       quickActions.classList.toggle('show', fabOpen);
     });
 
-    // ===================== QUICK ACTIONS =====================
-    function refreshWeather() {
-      updateBangkokWeatherFallback();
-      showToast('Weather refreshed for Bangkok!');
+    function refreshWeather(){ updateBangkokWeatherFallback(); showToast('Weather refreshed for Bangkok!'); }
+    function shareApp(){
+      if (navigator.share) { navigator.share({ title:'EBassWave AI Hub', text:'Check out this amazing AI Hub!', url: location.href }); }
+      else { navigator.clipboard.writeText(location.href); showToast('Link copied to clipboard!'); }
     }
+    function showInfo(){ showToast('EBassWave AI Hub v2.0 - Your personal productivity hub'); }
 
-    function shareApp() {
-      if (navigator.share) {
-        navigator.share({
-          title: 'EBassWave AI Hub',
-          text: 'Check out this amazing AI Hub!',
-          url: window.location.href
-        });
-      } else {
-        navigator.clipboard.writeText(window.location.href);
-        showToast('Link copied to clipboard!');
-      }
-    }
-
-    function showInfo() {
-      showToast('EBassWave AI Hub v2.0 - Your personal productivity hub');
-    }
-
-    // ===================== TOAST NOTIFICATIONS =====================
+    // ===================== TOAST =====================
     function showToast(message) {
       const toast = document.getElementById('toast');
       toast.textContent = message;
       toast.classList.add('show');
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+      setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     // ===================== SCROLL TO TOP =====================
     const scrollTopBtn = document.getElementById('scrollTopBtn');
-
     window.addEventListener('scroll', () => {
-      if (window.pageYOffset > 300) {
-        scrollTopBtn.classList.add('show');
-      } else {
-        scrollTopBtn.classList.remove('show');
-      }
+      if (window.pageYOffset > 300) scrollTopBtn.classList.add('show'); else scrollTopBtn.classList.remove('show');
     });
+    scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-    scrollTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // ===================== STATS ANIMATION =====================
+    // ===================== STATS =====================
     function animateStats() {
-      // Session time is updated in real-time above
-      // Other stats are static but meaningful for personal use
-      
-      // Animate total apps count
-      let appsCount = 0;
-      const appsTimer = setInterval(() => {
-        appsCount++;
-        document.getElementById('totalApps').textContent = appsCount;
-        if (appsCount >= 8) {
-          clearInterval(appsTimer);
-        }
-      }, 100);
+      const total = document.querySelectorAll('#appGrid a.card').length;
+      let count = 0;
+      const timer = setInterval(() => {
+        count++;
+        document.getElementById('totalApps').textContent = count;
+        if (count >= total) clearInterval(timer);
+      }, 90);
     }
-
-    // Start stats animation when page loads
     setTimeout(animateStats, 1500);
 
-    // ===================== LAST VISIT TRACKING =====================
+    // ===================== LAST VISIT =====================
     function updateLastVisit() {
       const lastVisit = localStorage.getItem('lastVisit');
       const now = new Date();
-      
       if (lastVisit) {
         const lastDate = new Date(lastVisit);
-        const diffTime = Math.abs(now - lastDate);
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) {
-          document.getElementById('lastVisit').textContent = 'Today';
-        } else if (diffDays === 1) {
-          document.getElementById('lastVisit').textContent = 'Yesterday';
-        } else {
-          document.getElementById('lastVisit').textContent = `${diffDays}d ago`;
-        }
-      } else {
-        document.getElementById('lastVisit').textContent = 'First time';
-      }
-      
-      // Update last visit time
+        const diffDays = Math.floor(Math.abs(now - lastDate) / (1000*60*60*24));
+        document.getElementById('lastVisit').textContent = diffDays === 0 ? 'Today' : (diffDays === 1 ? 'Yesterday' : `${diffDays}d ago`);
+      } else { document.getElementById('lastVisit').textContent = 'First time'; }
       localStorage.setItem('lastVisit', now.toISOString());
     }
-
     updateLastVisit();
 
-    // Enhanced hover glow effect
+    // ===================== Hover glow =====================
     const canHover = matchMedia('(hover: hover)').matches;
     if (canHover){
       for (const card of document.querySelectorAll('.card')){
@@ -1123,105 +771,52 @@
           card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
           card.style.setProperty('--my', (e.clientY - r.top) + 'px');
         }, {passive:true});
-        card.addEventListener('pointerleave', ()=>{
-          card.style.setProperty('--mx', '50%');
-          card.style.setProperty('--my', '50%');
-        }, {passive:true});
+        card.addEventListener('pointerleave', ()=>{ card.style.setProperty('--mx','50%'); card.style.setProperty('--my','50%'); }, {passive:true});
       }
     }
 
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // ===================== LOAD & GENERATE ICON SIZES =====================
-    function loadImage(url){
-      return new Promise((resolve, reject)=>{
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = url;
-      });
-    }
-
-    function drawCover(ctx, img, size){
-      const iw = img.naturalWidth || img.width;
-      const ih = img.naturalHeight || img.height;
-      const minSide = Math.min(iw, ih);
-      const sx = (iw - minSide) / 2;
-      const sy = (ih - minSide) / 2;
-      ctx.clearRect(0,0,size,size);
-      ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
-    }
-
+    // ===================== ICONS & MANIFEST (dynamic) =====================
+    function loadImage(url){ return new Promise((resolve, reject)=>{ const img=new Image(); img.crossOrigin="anonymous"; img.onload=()=>resolve(img); img.onerror=reject; img.src=url; }); }
+    function drawCover(ctx,img,size){ const iw=img.naturalWidth||img.width, ih=img.naturalHeight||img.height; const minSide=Math.min(iw,ih);
+      const sx=(iw-minSide)/2, sy=(ih-minSide)/2; ctx.clearRect(0,0,size,size); ctx.drawImage(img,sx,sy,minSide,minSide,0,0,size,size); }
     async function generateIconDataURLs(){
-      const sizes = [16,32,48,72,96,128,144,152,180,192,384,512];
-      try{
-        const img = await loadImage(ICON_URL);
-        const out = {};
-        for (const s of sizes){
-          const c = document.createElement('canvas');
-          c.width = c.height = s;
-          const x = c.getContext('2d');
-          drawCover(x, img, s);
-          out[s] = c.toDataURL('image/png');
-        }
-        return out;
-      }catch(e){
-        return null; // Fallback to using original URL
-      }
+      const sizes=[16,32,48,72,96,128,144,152,180,192,384,512];
+      try{ const img=await loadImage(ICON_URL); const out={}; for (const s of sizes){ const c=document.createElement('canvas'); c.width=c.height=s; const x=c.getContext('2d'); drawCover(x,img,s); out[s]=c.toDataURL('image/png'); } return out; }
+      catch(e){ return null; }
     }
-
     (async function setupIconsAndManifest(){
       const iconsMap = await generateIconDataURLs();
       const use = (sz)=> iconsMap ? iconsMap[sz] : ICON_URL;
-
-      const addLink = (rel, sizes, href, type) => {
-        const el = document.createElement('link');
-        el.rel = rel;
-        if (sizes) el.sizes = sizes;
-        if (type) el.type = type;
-        el.href = href;
-        document.head.appendChild(el);
-      };
-      addLink('icon', '16x16', use(16), 'image/png');
-      addLink('icon', '32x32', use(32), 'image/png');
-      addLink('apple-touch-icon', '180x180', use(180), null);
+      const addLink = (rel, sizes, href, type) => { const el=document.createElement('link'); el.rel=rel; if (sizes) el.sizes=sizes; if (type) el.type=type; el.href=href; document.head.appendChild(el); };
+      addLink('icon','16x16', use(16),'image/png'); addLink('icon','32x32', use(32),'image/png'); addLink('apple-touch-icon','180x180', use(180), null);
 
       const manifest = {
-        name: 'EBassWave AI Hub',
-        short_name: 'EBassWave',
+        name: 'EBassWave AI Hub', short_name: 'EBassWave',
         description: 'Your personal productivity hub - clean, modern design with futuristic aesthetics',
-        start_url: '/',
-        scope: '/',
-        display: 'standalone',
-        orientation: 'portrait-primary',
-        background_color: '#0b111b',
-        theme_color: '#0b111b',
-        lang: 'en',
-        dir: 'ltr',
-        categories: ['productivity', 'utilities', 'business'],
+        start_url: '/', scope: '/', display: 'standalone', orientation: 'portrait-primary',
+        background_color: '#0b111b', theme_color: '#0b111b', lang: 'en', dir: 'ltr',
+        categories: ['productivity','utilities','business'],
         screenshots: [{ src: use(512), sizes: '512x512', type: 'image/png', form_factor: 'narrow' }],
         icons: [
-          { src: use(48),  sizes: '48x48',  type: 'image/png', purpose: 'any' },
-          { src: use(72),  sizes: '72x72',  type: 'image/png', purpose: 'any' },
-          { src: use(96),  sizes: '96x96',  type: 'image/png', purpose: 'any' },
-          { src: use(128), sizes: '128x128',type: 'image/png', purpose: 'any' },
-          { src: use(144), sizes: '144x144',type: 'image/png', purpose: 'any' },
-          { src: use(152), sizes: '152x152',type: 'image/png', purpose: 'any' },
-          { src: use(180), sizes: '180x180',type: 'image/png', purpose: 'any' },
-          { src: use(192), sizes: '192x192',type: 'image/png', purpose: 'any' },
-          { src: use(384), sizes: '384x384',type: 'image/png', purpose: 'any' },
-          { src: use(512), sizes: '512x512',type: 'image/png', purpose: 'any' },
-          { src: use(192), sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-          { src: use(512), sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          { src: use(48), sizes: '48x48', type:'image/png', purpose: 'any' },
+          { src: use(72), sizes: '72x72', type:'image/png', purpose: 'any' },
+          { src: use(96), sizes: '96x96', type:'image/png', purpose: 'any' },
+          { src: use(128), sizes: '128x128', type:'image/png', purpose: 'any' },
+          { src: use(144), sizes: '144x144', type:'image/png', purpose: 'any' },
+          { src: use(152), sizes: '152x152', type:'image/png', purpose: 'any' },
+          { src: use(180), sizes: '180x180', type:'image/png', purpose: 'any' },
+          { src: use(192), sizes: '192x192', type:'image/png', purpose: 'any' },
+          { src: use(384), sizes: '384x384', type:'image/png', purpose: 'any' },
+          { src: use(512), sizes: '512x512', type:'image/png', purpose: 'any' },
+          { src: use(192), sizes: '192x192', type:'image/png', purpose: 'any maskable' },
+          { src: use(512), sizes: '512x512', type:'image/png', purpose: 'any maskable' }
         ]
       };
       const mblob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
-      const mlink = document.createElement('link'); 
-      mlink.rel='manifest'; 
-      mlink.href = URL.createObjectURL(mblob); 
-      document.head.appendChild(mlink);
+      const mlink = document.createElement('link'); mlink.rel='manifest'; mlink.href = URL.createObjectURL(mblob); document.head.appendChild(mlink);
     })();
 
     // ===================== SERVICE WORKER =====================
@@ -1229,82 +824,164 @@
       const swCode = `
         const CACHE_NAME = 'ebasswave-v3';
         const urlsToCache = ['/', '/index.html', '${ICON_URL}'];
-
         self.addEventListener('install', event => {
-          event.waitUntil(
-            caches.open(CACHE_NAME)
-              .then(cache => cache.addAll(urlsToCache))
-              .then(() => self.skipWaiting())
-          );
+          event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)).then(() => self.skipWaiting()));
         });
-
         self.addEventListener('activate', event => {
-          event.waitUntil(
-            caches.keys().then(cacheNames => Promise.all(
-              cacheNames.map(n => n !== CACHE_NAME ? caches.delete(n) : null)
-            )).then(() => self.clients.claim())
-          );
+          event.waitUntil(caches.keys().then(names => Promise.all(names.map(n => n !== CACHE_NAME ? caches.delete(n) : null))).then(() => self.clients.claim()));
         });
-
         self.addEventListener('fetch', event => {
-          event.respondWith(
-            caches.match(event.request).then(res => res || fetch(event.request))
-          );
+          event.respondWith(caches.match(event.request).then(res => res || fetch(event.request)));
         });
       `;
       const swBlob = new Blob([swCode], {type:'text/javascript'});
-      navigator.serviceWorker.register(URL.createObjectURL(swBlob))
-        .then(() => console.log('SW registered successfully'))
-        .catch(() => console.log('SW registration failed'));
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
     }
 
     // ===================== INSTALL PROMPT =====================
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
     const installContainer = document.getElementById('installContainer');
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installContainer.classList.add('show'); });
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; installContainer.classList.remove('show'); }
+    });
+    window.addEventListener('appinstalled', () => { installContainer.classList.remove('show'); deferredPrompt = null; showToast('App installed successfully!'); });
+    if (window.matchMedia('(display-mode: standalone)').matches) { installContainer.style.display = 'none'; }
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installContainer.classList.add('show');
+    // ===================== Smooth scroll & Perf log =====================
+    document.documentElement.style.scrollBehavior = 'smooth';
+    if ('performance' in window) { window.addEventListener('load', () => { const p = performance.getEntriesByType('navigation')[0]; if (p) console.log('Page load time:', p.loadEventEnd - p.loadEventStart, 'ms'); }); }
+
+    // Welcome message
+    setTimeout(() => { showToast('Welcome to your personal AI Hub!'); }, 2000);
+
+    // ===================== In-App Viewer Logic =====================
+    const viewer = document.getElementById('viewer');
+    const appFrame = document.getElementById('appFrame');
+    const viewerTitle = document.getElementById('viewerTitle');
+    const viewerIco = document.getElementById('viewerIco');
+    const viewerLoader = document.getElementById('viewerLoader');
+    const viewerMsg = document.getElementById('viewerMsg');
+
+    const btnClose = document.getElementById('btnClose');
+    const btnReload = document.getElementById('btnReload');
+    const btnExternal = document.getElementById('btnExternal');
+    const btnFullscreen = document.getElementById('btnFullscreen');
+
+    let currentApp = null;
+    let embedTimer = null;
+
+    // Build app map from cards (slug -> {name,url,glow})
+    const appMap = {};
+    document.querySelectorAll('#appGrid a.card').forEach(card => {
+      const name = card.dataset.name || card.getAttribute('aria-label') || card.querySelector('.title')?.textContent?.trim() || 'App';
+      const slug = (card.dataset.app || name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+      const url = card.getAttribute('href');
+      const glow = getComputedStyle(card).getPropertyValue('--glow') || 'var(--cyan)';
+      appMap[slug] = { name, url, glow };
+      // Intercept click for in-app open
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        openApp(slug);
+      });
     });
 
-    installBtn.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log('Install prompt outcome:', outcome);
-        deferredPrompt = null;
-        installContainer.classList.remove('show');
+    function applyGlowToIco(glow){
+      viewerIco.style.background = `linear-gradient(135deg, color-mix(in oklab, ${glow} 25%, rgba(15,22,37,.9)), color-mix(in oklab, ${glow} 15%, rgba(10,18,32,.95)))`;
+      viewerIco.style.boxShadow = `inset 0 0 0 1px color-mix(in oklab, ${glow} 38%, rgba(255,255,255,.1)), 0 0 18px color-mix(in oklab, ${glow} 22%, transparent)`;
+    }
+
+    function openApp(slug){
+      const app = appMap[slug];
+      if (!app) return;
+      currentApp = app;
+      document.body.classList.add('noscroll');
+      viewer.classList.add('show');
+      viewer.setAttribute('aria-hidden','false');
+      viewerTitle.textContent = app.name;
+      applyGlowToIco(app.glow);
+      viewerLoader.classList.add('show');
+      viewerMsg.classList.remove('show');
+      appFrame.src = app.url;
+
+      // History state & lastApp
+      if (location.search !== `?app=${encodeURIComponent(slug)}`) {
+        history.pushState({ app: slug }, '', `?app=${encodeURIComponent(slug)}`);
+      }
+      try { localStorage.setItem('lastApp', slug); } catch(e){}
+
+      // Fallback if embedding blocked / slow
+      clearTimeout(embedTimer);
+      embedTimer = setTimeout(() => {
+        viewerMsg.classList.add('show');
+      }, 2500);
+    }
+
+    function closeViewer(){
+      viewer.classList.remove('show');
+      viewer.setAttribute('aria-hidden','true');
+      document.body.classList.remove('noscroll');
+      viewerLoader.classList.remove('show');
+      viewerMsg.classList.remove('show');
+      appFrame.removeAttribute('src');
+      currentApp = null;
+
+      // Clean URL (go back if state was pushed)
+      if (history.state && history.state.app) {
+        history.back();
+      } else {
+        const url = new URL(location.href);
+        url.searchParams.delete('app');
+        history.replaceState({}, '', url.pathname + url.search);
+      }
+    }
+
+    // iframe load handler -> hide loader/message
+    appFrame.addEventListener('load', () => {
+      clearTimeout(embedTimer);
+      viewerLoader.classList.remove('show');
+      viewerMsg.classList.remove('show');
+    });
+
+    // Controls
+    btnClose.addEventListener('click', closeViewer);
+    btnReload.addEventListener('click', () => {
+      if (!currentApp) return;
+      viewerLoader.classList.add('show');
+      appFrame.src = currentApp.url; // reload src
+    });
+    btnExternal.addEventListener('click', () => { if (currentApp) window.open(currentApp.url, '_blank', 'noopener'); });
+    btnFullscreen.addEventListener('click', async () => {
+      try{
+        if (document.fullscreenElement) { await document.exitFullscreen(); }
+        else { await appFrame.requestFullscreen(); }
+      }catch(e){}
+    });
+
+    // Close by ESC or clicking outside header area? (Backdrop close on header dblclick)
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && viewer.classList.contains('show')) closeViewer(); });
+
+    // Handle popstate (Back/Forward)
+    window.addEventListener('popstate', (e) => {
+      const slug = e.state?.app || new URLSearchParams(location.search).get('app');
+      if (slug && appMap[slug]) {
+        // If viewer not shown or different app, open
+        if (!viewer.classList.contains('show') || currentApp?.name !== appMap[slug].name) openApp(slug);
+      } else {
+        // No app in url -> ensure viewer closed
+        if (viewer.classList.contains('show')) closeViewer();
       }
     });
 
-    window.addEventListener('appinstalled', () => {
-      console.log('PWA was installed');
-      installContainer.classList.remove('show');
-      deferredPrompt = null;
-      showToast('App installed successfully!');
-    });
+    // Open app from URL (?app=slug) on load
+    (function openFromURL(){
+      const slug = new URLSearchParams(location.search).get('app');
+      if (slug && appMap[slug]) openApp(slug);
+      // Optional: quick resume last app (commented)
+      // else { const last = localStorage.getItem('lastApp'); if (last && appMap[last]) openApp(last); }
+    })();
 
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      installContainer.style.display = 'none';
-    }
-
-    // Smooth scroll
-    document.documentElement.style.scrollBehavior = 'smooth';
-
-    // Performance monitoring
-    if ('performance' in window) {
-      window.addEventListener('load', () => {
-        const perfData = performance.getEntriesByType('navigation')[0];
-        if (perfData) console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
-      });
-    }
-
-    // Welcome message
-    setTimeout(() => {
-      showToast('Welcome to your personal AI Hub!');
-    }, 2000);
   </script>
 </body>
 </html>
