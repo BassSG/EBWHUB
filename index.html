@@ -490,15 +490,11 @@
       </div>
     </div>
 
-    <!-- Time and Weather Widgets -->
+    <!-- Time  -->
     <div class="widget-container">
       <div class="time-widget">
         <div class="time-display" id="timeDisplay">--:--</div>
         <div class="date-display" id="dateDisplay">Loading...</div>
-      </div>
-      <div class="weather-widget">
-        <div class="weather-display" id="weatherDisplay">--°C</div>
-        <div class="weather-desc" id="weatherDesc">Updating…</div>
       </div>
     </div>
 
@@ -690,20 +686,6 @@
         showToast('Weather updated for Bangkok!');
       } catch (error) { updateBangkokWeatherFallback(); }
     }
-    function updateBangkokWeatherFallback() {
-      const hour = new Date().getHours();
-      let temp, condition;
-      if (hour >= 6 && hour < 12){ temp = Math.floor(Math.random()*5)+26; condition = ['Partly Cloudy','Sunny','Hazy'][Math.floor(Math.random()*3)]; }
-      else if (hour >= 12 && hour < 18){ temp = Math.floor(Math.random()*6)+30; condition = ['Hot','Very Hot','Partly Cloudy','Thunderstorms'][Math.floor(Math.random()*4)]; }
-      else if (hour >= 18 && hour < 22){ temp = Math.floor(Math.random()*5)+28; condition = ['Partly Cloudy','Clear','Light Rain'][Math.floor(Math.random()*3)]; }
-      else { temp = Math.floor(Math.random()*5)+24; condition = ['Clear','Partly Cloudy','Humid'][Math.floor(Math.random()*3)]; }
-      const wd = document.getElementById('weatherDisplay');
-      const wc = document.getElementById('weatherDesc');
-      if (wd) wd.textContent = `${temp}°C`;
-      if (wc) wc.textContent = condition;
-    }
-    updateBangkokWeatherFallback();
-    setInterval(updateBangkokWeatherFallback, 600000);
 
     // ===================== FAB =====================
     const fabBtn = document.getElementById('fabBtn');
