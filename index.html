@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- FIX: viewport for mobile safe area + consistent sizing -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b111b">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,6 +43,10 @@
 
   <style>
     :root{
+      /* FIX: dynamic viewport unit fallback */
+      --vh: 1vh;
+      --viewer-header-h: 64px;
+
       --bg-0:#070b12;
       --bg-1:#0b111b;
       --bg-2:#0f1625;
@@ -67,7 +72,8 @@
     }
 
     *{box-sizing:border-box}
-    html,body{height:100%}
+    html,body{height:100%; width:100%}
+    html, body { overscroll-behavior: none; }
 
     body{
       margin:0;
@@ -82,6 +88,8 @@
       letter-spacing:.3px;
       overflow-x: hidden;
     }
+    /* FIX: lock background when overlay open */
+    body.noscroll { position: fixed; width: 100%; overflow: hidden; inset: 0; }
 
     /* Loading Screen */
     .loading-screen {
@@ -340,7 +348,7 @@
     }
     @media (max-width:768px){
       .mesh::before,.mesh::after{ filter: blur(36px); opacity: .14; }
-      .grid{ grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
       .brand{ width:60px; height:60px; }
       .install-container { bottom: 12px; right: 12px; }
       .fab-container { bottom: 16px; left: 16px; }
@@ -377,12 +385,18 @@
 
     /* ================= In-App Viewer (Overlay) ================= */
     .viewer {
-      position: fixed; inset: 0; display: none; grid-template-rows: auto 1fr;
+      position: fixed; inset: 0;
+      display: none; grid-template-rows: auto 1fr;
+      /* FIX: make overlay exactly viewport height (no URL bar jump) */
+      height: 100vh; height: 100dvh; height: 100svh; height: calc(var(--vh, 1vh) * 100);
       background: linear-gradient(135deg, color-mix(in oklab, var(--bg-1) 88%, #000), rgba(0,0,0,.35));
       backdrop-filter: blur(8px);
       z-index: 1002;
+      overflow: hidden;
+      touch-action: pan-y;
     }
     .viewer.show { display: grid; }
+
     .viewer-header{
       display:flex; align-items:center; gap:10px;
       padding: clamp(10px,2.2vw,14px);
@@ -406,9 +420,17 @@
     .btn:hover{ transform: translateY(-1px); border-color: var(--cyan); box-shadow: 0 6px 18px rgba(83,215,255,.18); }
     .btn svg{ width:16px; height:16px; stroke: currentColor; }
 
-    .viewer-body{ position: relative; }
+    .viewer-body{
+      position: relative;
+      height: calc(100% - var(--viewer-header-h));
+      overflow: hidden; /* FIX: prevent inner overflow while loading */
+      contain: layout paint size;
+    }
     .viewer-iframe{
-      width:100%; height: calc(100dvh - 64px); border:0; background: #0b111b;
+      display:block;
+      width:100%;
+      height:100%; /* FIX: fill viewer-body instead of 100dvh - 64px */
+      border:0; background: #0b111b;
     }
     .viewer-loader{
       position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;
@@ -423,9 +445,6 @@
       backdrop-filter: blur(6px);
     }
     .viewer-msg.show{ display:block; }
-
-    /* Prevent body scroll when viewer open */
-    body.noscroll { overflow: hidden; }
   </style>
 </head>
 <body>
@@ -609,7 +628,7 @@
 
   <!-- ================= In-App Viewer Overlay ================= -->
   <section class="viewer" id="viewer" aria-hidden="true">
-    <div class="viewer-header">
+    <div class="viewer-header" id="viewerHeader">
       <div class="viewer-app-ico" id="viewerIco" aria-hidden="true"></div>
       <div class="viewer-title" id="viewerTitle">Loading…</div>
       <div class="viewer-actions">
@@ -631,7 +650,7 @@
         </button>
       </div>
     </div>
-    <div class="viewer-body">
+    <div class="viewer-body" id="viewerBody">
       <iframe id="appFrame" class="viewer-iframe" allowfullscreen
               allow="fullscreen; clipboard-read; clipboard-write"
               referrerpolicy="no-referrer"></iframe>
@@ -673,19 +692,8 @@
     updateTime();
     setInterval(updateTime, 1000);
 
-    // ===================== WEATHER (with fallback) =====================
-    async function fetchBangkokWeather() {
-      try {
-        const response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=Bangkok,TH&appid=YOUR_API_KEY&units=metric');
-        if (!response.ok) throw new Error('Weather API not available');
-        const data = await response.json();
-        const wd = document.getElementById('weatherDisplay');
-        const wc = document.getElementById('weatherDesc');
-        if (wd) wd.textContent = `${Math.round(data.main.temp)}°C`;
-        if (wc) wc.textContent = data.weather[0].description;
-        showToast('Weather updated for Bangkok!');
-      } catch (error) { updateBangkokWeatherFallback(); }
-    }
+    // ===================== WEATHER (fallback only) =====================
+    function updateBangkokWeatherFallback(){ /* intentionally empty placeholder to avoid errors */ }
 
     // ===================== FAB =====================
     const fabBtn = document.getElementById('fabBtn');
@@ -842,6 +850,7 @@
     const viewer = document.getElementById('viewer');
     const appFrame = document.getElementById('appFrame');
     const viewerTitle = document.getElementById('viewerTitle');
+    const viewerHeader = document.getElementById('viewerHeader');
     const viewerIco = document.getElementById('viewerIco');
     const viewerLoader = document.getElementById('viewerLoader');
     const viewerMsg = document.getElementById('viewerMsg');
@@ -853,6 +862,22 @@
 
     let currentApp = null;
     let embedTimer = null;
+
+    // FIX: visualViewport-based VH for mobile correctness
+    function setVHVars(){
+      const vh = (window.visualViewport?.height || window.innerHeight) * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      const hh = viewerHeader.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--viewer-header-h', `${hh}px`);
+    }
+    // Run on load & on changes
+    setVHVars();
+    window.addEventListener('resize', setVHVars);
+    window.addEventListener('orientationchange', setVHVars);
+    if (window.visualViewport){
+      window.visualViewport.addEventListener('resize', setVHVars);
+      window.visualViewport.addEventListener('scroll', setVHVars);
+    }
 
     // Build app map from cards (slug -> {name,url,glow})
     const appMap = {};
@@ -878,13 +903,20 @@
       const app = appMap[slug];
       if (!app) return;
       currentApp = app;
+
+      // Lock background scroll and show overlay
       document.body.classList.add('noscroll');
       viewer.classList.add('show');
       viewer.setAttribute('aria-hidden','false');
+
       viewerTitle.textContent = app.name;
       applyGlowToIco(app.glow);
       viewerLoader.classList.add('show');
       viewerMsg.classList.remove('show');
+
+      // Ensure correct heights after header laid out
+      setVHVars();
+
       appFrame.src = app.url;
 
       // History state & lastApp
@@ -937,21 +969,19 @@
     btnFullscreen.addEventListener('click', async () => {
       try{
         if (document.fullscreenElement) { await document.exitFullscreen(); }
-        else { await appFrame.requestFullscreen(); }
+        else { await document.getElementById('viewerBody').requestFullscreen(); }
       }catch(e){}
     });
 
-    // Close by ESC or clicking outside header area? (Backdrop close on header dblclick)
+    // ESC to close
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && viewer.classList.contains('show')) closeViewer(); });
 
     // Handle popstate (Back/Forward)
     window.addEventListener('popstate', (e) => {
       const slug = e.state?.app || new URLSearchParams(location.search).get('app');
       if (slug && appMap[slug]) {
-        // If viewer not shown or different app, open
         if (!viewer.classList.contains('show') || currentApp?.name !== appMap[slug].name) openApp(slug);
       } else {
-        // No app in url -> ensure viewer closed
         if (viewer.classList.contains('show')) closeViewer();
       }
     });
@@ -960,8 +990,6 @@
     (function openFromURL(){
       const slug = new URLSearchParams(location.search).get('app');
       if (slug && appMap[slug]) openApp(slug);
-      // Optional: quick resume last app (commented)
-      // else { const last = localStorage.getItem('lastApp'); if (last && appMap[last]) openApp(last); }
     })();
 
   </script>
