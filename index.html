@@ -397,11 +397,21 @@
     }
     .viewer.show { display: grid; }
 
+    /* NEW: Auto-fullscreen mode for mobile */
+    .viewer.fullscreen {
+      grid-template-rows: 1fr;
+    }
+    .viewer.fullscreen .viewer-header {
+      display: none;
+    }
+
     .viewer-header{
       display:flex; align-items:center; gap:10px;
       padding: clamp(10px,2.2vw,14px);
       background: linear-gradient(180deg, rgba(15,22,37, .92), rgba(11,17,27, .88));
       border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 1003;
     }
     .viewer-app-ico{
       width:32px; height:32px; border-radius:10px; display:grid; place-items:center;
@@ -422,7 +432,7 @@
 
     .viewer-body{
       position: relative;
-      height: calc(100% - var(--viewer-header-h));
+      height: 100%;
       overflow: hidden; /* FIX: prevent inner overflow while loading */
       contain: layout paint size;
     }
@@ -445,6 +455,99 @@
       backdrop-filter: blur(6px);
     }
     .viewer-msg.show{ display:block; }
+
+    /* NEW: Floating controls for fullscreen mode */
+    .floating-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: none;
+      gap: 8px;
+      z-index: 1004;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .viewer.fullscreen .floating-controls {
+      display: flex;
+    }
+    .viewer.fullscreen:hover .floating-controls,
+    .floating-controls:hover {
+      opacity: 1;
+    }
+    .floating-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(11,17,27,.95));
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    }
+    .floating-btn:hover {
+      transform: scale(1.1);
+      border-color: var(--cyan);
+      box-shadow: 0 0 20px rgba(83,215,255,.3);
+    }
+    .floating-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--ink-soft);
+    }
+
+    /* NEW: Swipe gesture indicator */
+    .swipe-indicator {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(11,17,27,.95));
+      border: 1px solid var(--border-light);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .viewer.fullscreen .swipe-indicator {
+      opacity: 1;
+    }
+
+    /* NEW: Mobile-specific styles */
+    @media (max-width: 768px) {
+      .viewer-header {
+        padding: 8px 12px;
+      }
+      .btn {
+        height: 32px;
+        padding: 0 10px;
+        font-size: 0.85rem;
+      }
+      .btn svg {
+        width: 14px;
+        height: 14px;
+      }
+      .floating-controls {
+        top: 15px;
+        right: 15px;
+        gap: 6px;
+      }
+      .floating-btn {
+        width: 36px;
+        height: 36px;
+      }
+      .floating-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -655,7 +758,25 @@
               allow="fullscreen; clipboard-read; clipboard-write"
               referrerpolicy="no-referrer"></iframe>
       <div class="viewer-loader" id="viewerLoader"><div class="loading-spinner"></div></div>
-      <div class="viewer-msg" id="viewerMsg">This site may block embedding. Use “New Tab” if it doesn’t load.</div>
+      <div class="viewer-msg" id="viewerMsg">This site may block embedding. Use "New Tab" if it doesn't load.</div>
+      
+      <!-- NEW: Floating controls for fullscreen mode -->
+      <div class="floating-controls" id="floatingControls">
+        <button class="floating-btn" id="floatingReload" title="Reload">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+        <button class="floating-btn" id="floatingExternal" title="Open in new tab">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v7h-7"/></svg>
+        </button>
+        <button class="floating-btn" id="floatingExit" title="Exit fullscreen">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+        </button>
+      </div>
+
+      <!-- NEW: Swipe indicator -->
+      <div class="swipe-indicator" id="swipeIndicator">
+        Swipe down to exit fullscreen
+      </div>
     </div>
   </section>
 
@@ -663,6 +784,10 @@
     // ===================== ICON SOURCE (EXTERNAL) =====================
     const ICON_URL = "https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372";
     document.getElementById('brandImg').src = ICON_URL;
+
+    // ===================== DEVICE DETECTION =====================
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     // ===================== LOADING SCREEN =====================
     window.addEventListener('load', () => {
@@ -854,14 +979,22 @@
     const viewerIco = document.getElementById('viewerIco');
     const viewerLoader = document.getElementById('viewerLoader');
     const viewerMsg = document.getElementById('viewerMsg');
+    const floatingControls = document.getElementById('floatingControls');
+    const swipeIndicator = document.getElementById('swipeIndicator');
 
     const btnClose = document.getElementById('btnClose');
     const btnReload = document.getElementById('btnReload');
     const btnExternal = document.getElementById('btnExternal');
     const btnFullscreen = document.getElementById('btnFullscreen');
 
+    // Floating controls
+    const floatingReload = document.getElementById('floatingReload');
+    const floatingExternal = document.getElementById('floatingExternal');
+    const floatingExit = document.getElementById('floatingExit');
+
     let currentApp = null;
     let embedTimer = null;
+    let isFullscreen = false;
 
     // FIX: visualViewport-based VH for mobile correctness
     function setVHVars(){
@@ -909,6 +1042,13 @@
       viewer.classList.add('show');
       viewer.setAttribute('aria-hidden','false');
 
+      // NEW: Auto-fullscreen on mobile
+      if (isMobile) {
+        setTimeout(() => {
+          toggleFullscreen(true);
+        }, 500); // Small delay to ensure viewer is shown
+      }
+
       viewerTitle.textContent = app.name;
       applyGlowToIco(app.glow);
       viewerLoader.classList.add('show');
@@ -940,6 +1080,11 @@
       viewerMsg.classList.remove('show');
       appFrame.removeAttribute('src');
       currentApp = null;
+      
+      // Reset fullscreen state
+      if (isFullscreen) {
+        toggleFullscreen(false);
+      }
 
       // Clean URL (go back if state was pushed)
       if (history.state && history.state.app) {
@@ -948,6 +1093,26 @@
         const url = new URL(location.href);
         url.searchParams.delete('app');
         history.replaceState({}, '', url.pathname + url.search);
+      }
+    }
+
+    function toggleFullscreen(force = null) {
+      isFullscreen = force !== null ? force : !isFullscreen;
+      
+      if (isFullscreen) {
+        viewer.classList.add('fullscreen');
+        btnFullscreen.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+          Exit
+        `;
+        btnFullscreen.title = 'Exit fullscreen';
+      } else {
+        viewer.classList.remove('fullscreen');
+        btnFullscreen.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+          Full
+        `;
+        btnFullscreen.title = 'Fullscreen';
       }
     }
 
@@ -966,15 +1131,72 @@
       appFrame.src = currentApp.url; // reload src
     });
     btnExternal.addEventListener('click', () => { if (currentApp) window.open(currentApp.url, '_blank', 'noopener'); });
-    btnFullscreen.addEventListener('click', async () => {
-      try{
-        if (document.fullscreenElement) { await document.exitFullscreen(); }
-        else { await document.getElementById('viewerBody').requestFullscreen(); }
-      }catch(e){}
+    btnFullscreen.addEventListener('click', () => toggleFullscreen());
+
+    // Floating controls
+    floatingReload.addEventListener('click', () => {
+      if (!currentApp) return;
+      viewerLoader.classList.add('show');
+      appFrame.src = currentApp.url;
     });
+    floatingExternal.addEventListener('click', () => { if (currentApp) window.open(currentApp.url, '_blank', 'noopener'); });
+    floatingExit.addEventListener('click', () => toggleFullscreen(false));
+
+    // NEW: Touch/swipe gestures for mobile
+    let touchStartY = 0;
+    let touchStartTime = 0;
+
+    viewer.addEventListener('touchstart', (e) => {
+      if (!isFullscreen) return;
+      touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
+    }, { passive: true });
+
+    viewer.addEventListener('touchmove', (e) => {
+      if (!isFullscreen) return;
+      const touchY = e.touches[0].clientY;
+      const deltaY = touchY - touchStartY;
+      
+      // Show swipe indicator when swiping down
+      if (deltaY > 50) {
+        swipeIndicator.style.opacity = '1';
+        swipeIndicator.textContent = 'Release to exit fullscreen';
+      } else {
+        swipeIndicator.style.opacity = '0.7';
+        swipeIndicator.textContent = 'Swipe down to exit fullscreen';
+      }
+    }, { passive: true });
+
+    viewer.addEventListener('touchend', (e) => {
+      if (!isFullscreen) return;
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchEndY - touchStartY;
+      const deltaTime = Date.now() - touchStartTime;
+      
+      // Exit fullscreen if swipe down is significant
+      if (deltaY > 100 && deltaTime < 500) {
+        toggleFullscreen(false);
+      }
+      
+      // Reset swipe indicator
+      setTimeout(() => {
+        swipeIndicator.style.opacity = '';
+        swipeIndicator.textContent = 'Swipe down to exit fullscreen';
+      }, 300);
+    }, { passive: true });
 
     // ESC to close
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && viewer.classList.contains('show')) closeViewer(); });
+    document.addEventListener('keydown', (e) => { 
+      if (e.key === 'Escape') {
+        if (viewer.classList.contains('show')) {
+          if (isFullscreen) {
+            toggleFullscreen(false);
+          } else {
+            closeViewer();
+          }
+        }
+      }
+    });
 
     // Handle popstate (Back/Forward)
     window.addEventListener('popstate', (e) => {
