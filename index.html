@@ -817,6 +817,10 @@
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
+    // ===================== FULLSCREEN SETTINGS (NEW) =====================
+    const AUTO_FULL_ON_OPEN = true;            // เปิดแอปแล้วเข้า fullscreen (CSS) ทันที
+    const PREFER_BROWSER_FULLSCREEN = true;    // พยายามขอ Browser Fullscreen จริง ถ้าอนุญาต
+
     // ===================== LOADING SCREEN =====================
     window.addEventListener('load', () => {
       setTimeout(() => document.getElementById('loadingScreen').classList.add('hidden'), 1000);
@@ -1048,10 +1052,10 @@
       const url = card.getAttribute('href');
       const glow = getComputedStyle(card).getPropertyValue('--glow') || 'var(--cyan)';
       appMap[slug] = { name, url, glow };
-      // Intercept click for in-app open
+      // Intercept click for in-app open (pass event for fullscreen permission)
       card.addEventListener('click', (e) => {
         e.preventDefault();
-        openApp(slug);
+        openApp(slug, e);
       });
     });
 
@@ -1060,7 +1064,22 @@
       viewerIco.style.boxShadow = `inset 0 0 0 1px color-mix(in oklab, ${glow} 38%, rgba(255,255,255,.1)), 0 0 18px color-mix(in oklab, ${glow} 22%, transparent)`;
     }
 
-    function openApp(slug){
+    // NEW: Try requesting real browser fullscreen (silent if blocked)
+    async function tryBrowserFullscreen(evt){
+      if (document.fullscreenElement) return;
+      const targetEl = document.getElementById('viewer');
+      try {
+        if (targetEl.requestFullscreen) {
+          await targetEl.requestFullscreen();
+        } else if (targetEl.webkitRequestFullscreen) {
+          await targetEl.webkitRequestFullscreen();
+        }
+      } catch(e){
+        // silently ignore
+      }
+    }
+
+    function openApp(slug, evt){
       const app = appMap[slug];
       if (!app) return;
       currentApp = app;
@@ -1070,13 +1089,6 @@
       viewer.classList.add('show');
       viewer.setAttribute('aria-hidden','false');
 
-      // NEW: Auto-fullscreen on mobile
-      if (isMobile) {
-        setTimeout(() => {
-          toggleFullscreen(true);
-        }, 500); // Small delay to ensure viewer is shown
-      }
-
       viewerTitle.textContent = app.name;
       applyGlowToIco(app.glow);
       viewerLoader.classList.add('show');
@@ -1084,6 +1096,17 @@
 
       // Ensure correct heights after header laid out
       setVHVars();
+
+      // ====== Auto Fullscreen on open (ALL platforms) ======
+      if (AUTO_FULL_ON_OPEN) {
+        // 1) CSS fullscreen mode
+        toggleFullscreen(true);
+        // 2) Real browser fullscreen (if allowed)
+        if (PREFER_BROWSER_FULLSCREEN) {
+          tryBrowserFullscreen(evt);
+        }
+      }
+      // =====================================================
 
       appFrame.src = app.url;
 
@@ -1109,9 +1132,14 @@
       appFrame.removeAttribute('src');
       currentApp = null;
       
-      // Reset fullscreen state
+      // Reset CSS fullscreen state
       if (isFullscreen) {
         toggleFullscreen(false);
+      }
+
+      // NEW: Exit real browser fullscreen if still active
+      if (document.fullscreenElement) {
+        try { document.exitFullscreen(); } catch(e){}
       }
 
       // Clean URL (go back if state was pushed)
@@ -1213,7 +1241,7 @@
       }, 300);
     }, { passive: true });
 
-    // ESC to close
+    // ESC to close / exit fullscreen
     document.addEventListener('keydown', (e) => { 
       if (e.key === 'Escape') {
         if (viewer.classList.contains('show')) {
