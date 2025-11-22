@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <!-- FIX: viewport for mobile safe area + consistent sizing -->
+  <!-- Mobile safe viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b111b">
   <meta name="mobile-web-app-capable" content="yes">
@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="EBassWave AI Hub">
 
-  <!-- PWA Meta Tags -->
+  <!-- PWA Meta -->
   <meta name="application-name" content="EBassWave AI Hub">
   <meta name="msapplication-TileColor" content="#0b111b">
   <meta name="msapplication-config" content="browserconfig.xml">
@@ -19,14 +19,14 @@
   <meta name="description" content="AI isn't everything. But it's everything.">
   <meta name="color-scheme" content="dark">
 
-  <!-- Perf: preconnect/dns-prefetch to app host -->
+  <!-- Perf: preconnect -->
   <link rel="preconnect" href="https://basssg.github.io" crossorigin>
   <link rel="dns-prefetch" href="//basssg.github.io">
-
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Favicon & Touch Icons (static: load before JS) -->
+  <!-- Icons (ใช้ไฟล์เดียวกับใน JS) -->
   <link rel="icon" type="image/png" sizes="32x32"
         href="https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372">
   <link rel="icon" type="image/png" sizes="16x16"
@@ -38,22 +38,24 @@
   <meta name="msapplication-TileImage"
         content="https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372">
 
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="#" id="manifest-placeholder">
+  <!-- Manifest (จะใส่ href ผ่าน JS) -->
+  <link rel="manifest" href="" id="app-manifest">
 
   <style>
     :root{
-      /* FIX: dynamic viewport unit fallback */
+      /* dynamic viewport */
       --vh: 1vh;
       --viewer-header-h: 64px;
 
       --bg-0:#070b12;
       --bg-1:#0b111b;
       --bg-2:#0f1625;
+
       --ink:#e8f1ff;
       --ink-soft:#d1dce8;
       --muted:#93a3b8;
       --muted-light:#a8b5c7;
+
       --cyan:#53d7ff;
       --green:#39ffb6;
       --violet:#a88bff;
@@ -62,13 +64,20 @@
       --pink:#ff6b9d;
       --red:#ff5757;
       --yellow:#ffd93d;
+
       --card:#0f1625aa;
       --card-solid:#0f1625;
+
       --border:#1f2a40;
       --border-light:#2a3548;
-      --shadow: 0 10px 20px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.25);
-      --shadow-lg: 0 20px 40px rgba(0,0,0,.4), 0 8px 16px rgba(0,0,0,.3);
-      --glow-soft: 0 0 20px rgba(83,215,255,.15);
+
+      /* ลดจางลงหน่อยให้เบา */
+      --shadow: 0 6px 18px rgba(0,0,0,.38);
+      --shadow-lg: 0 12px 28px rgba(0,0,0,.42);
+
+      --glow-soft: 0 0 20px rgba(83,215,255,.12);
+
+      --transition-fast: 0.2s cubic-bezier(.4,0,.2,1);
     }
 
     *{box-sizing:border-box}
@@ -88,7 +97,7 @@
       letter-spacing:.3px;
       overflow-x: hidden;
     }
-    /* FIX: lock background when overlay open */
+    /* lock background when overlay open */
     body.noscroll { position: fixed; width: 100%; overflow: hidden; inset: 0; }
 
     /* Loading Screen */
@@ -100,12 +109,15 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
     }
     .loading-screen.hidden { opacity: 0; visibility: hidden; }
     .loading-spinner {
-      width: 60px; height: 60px; border: 3px solid var(--border); border-top: 3px solid var(--cyan);
-      border-radius: 50%; animation: spin 1s linear infinite;
+      width: 52px; height: 52px;
+      border: 3px solid var(--border);
+      border-top: 3px solid var(--cyan);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
     @keyframes spin { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 
@@ -114,240 +126,498 @@
     .fab {
       width: 56px; height: 56px; border-radius: 50%;
       background: linear-gradient(135deg, var(--violet), var(--pink));
-      border: none; cursor: pointer; box-shadow: 0 8px 20px rgba(168,139,255,.3);
-      display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; position: relative; overflow: hidden;
+      border: none; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(168,139,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity 0.15s ease;
+      position: relative; overflow: hidden;
     }
-    .fab:hover { transform: scale(1.1); box-shadow: 0 12px 30px rgba(168,139,255,.4); }
-    .fab svg { width: 24px; height: 24px; fill: white; transition: transform 0.3s ease; }
+    .fab:hover { transform: scale(1.06); box-shadow: 0 12px 30px rgba(168,139,255,.4); }
+    .fab svg { width: 24px; height: 24px; fill: white; transition: transform 0.28s ease; }
     .fab.active svg { transform: rotate(45deg); }
 
     /* Quick Actions Menu */
     .quick-actions {
-      position: absolute; bottom: 70px; left: 0; display: flex; flex-direction: column; gap: 12px;
-      opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: none;
+      position: absolute; bottom: 70px; left: 0;
+      display: flex; flex-direction: column; gap: 10px;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+      pointer-events: none;
     }
     .quick-actions.show { opacity: 1; transform: translateY(0); pointer-events: all; }
     .quick-action {
       width: 48px; height: 48px; border-radius: 50%;
       background: linear-gradient(135deg, var(--card-solid), var(--bg-2));
       border: 1px solid var(--border-light);
-      display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
     }
-    .quick-action:hover { transform: scale(1.1); border-color: var(--cyan); box-shadow: 0 0 20px rgba(83,215,255,.3); }
+    .quick-action:hover {
+      transform: scale(1.08);
+      border-color: var(--cyan);
+      box-shadow: 0 0 16px rgba(83,215,255,.25);
+      background: linear-gradient(135deg, rgba(15,22,37,1), rgba(11,17,27,1));
+    }
     .quick-action svg { width: 20px; height: 20px; stroke: var(--ink-soft); }
 
     /* Stats Cards */
     .stats-container {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px; margin: 20px 0; opacity: 0; transform: translateY(20px); animation: fadeInUp 0.6s ease-out 0.4s forwards;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeInUp 0.6s ease-out 0.35s forwards;
     }
     .stat-card {
-      padding: 16px; background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
-      border: 1px solid var(--border); border-radius: 12px; text-align: center; backdrop-filter: blur(10px); transition: all 0.3s ease;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(15,22,37,.94), rgba(11,17,27,.98));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
     }
-    .stat-card:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 8px 25px rgba(83,215,255,.15); }
-    .stat-number { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--cyan), var(--green));
-      -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 4px; }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      box-shadow: 0 10px 26px rgba(83,215,255,.16);
+    }
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+      margin-bottom: 4px;
+    }
     .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
 
     /* Install Button Styles */
-    .install-container { position: fixed; bottom: 14px; right: 14px; z-index: 1000; opacity: 0; transform: translateY(60px); transition: all 0.25s ease; }
+    .install-container {
+      position: fixed; bottom: 14px; right: 14px;
+      z-index: 1000;
+      opacity: 0; transform: translateY(60px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
     .install-container.show { opacity: 1; transform: translateY(0); }
     .install-btn {
-      background: linear-gradient(135deg, var(--cyan), var(--green)); border: none; border-radius: 999px; padding: 10px 16px;
-      color: var(--bg-0); font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 8px 20px rgba(83,215,255,.28);
-      display: flex; align-items: center; gap: 8px; transition: all 0.25s ease; font-family: inherit;
+      background: linear-gradient(135deg, var(--cyan), var(--green));
+      border: none; border-radius: 999px;
+      padding: 9px 16px;
+      color: var(--bg-0); font-weight: 700; font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(83,215,255,.28);
+      display: flex; align-items: center; gap: 8px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter 0.2s ease;
+      font-family: inherit;
     }
+    .install-btn:hover { transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 12px 26px rgba(83,215,255,.32); }
     .install-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
     /* Status Bar for PWA */
     .status-bar { position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0); background: var(--bg-0); z-index: 1000; }
 
-    /* Background mesh */
-    .mesh{ position: fixed; inset:0; pointer-events:none; z-index: -1; }
-    .mesh::before,.mesh::after{
-      content: ""; position: absolute; inset:0; filter: blur(48px); opacity: .18;
+    /* Background mesh (ทำให้เป็น static ลด animation/blur หนัก ๆ) */
+    .mesh{
+      position: fixed;
+      inset:0;
+      pointer-events:none;
+      z-index: -1;
+    }
+    .mesh::before,
+    .mesh::after{
+      content: "";
+      position: absolute;
+      inset:-20%;
+      filter: blur(32px);
+      opacity: .18;
       background:
-        radial-gradient(circle at 25% 30%, rgba(83,215,255,.38), transparent 50%),
-        radial-gradient(circle at 75% 70%, rgba(168,139,255,.3), transparent 50%),
-        radial-gradient(circle at 50% 10%, rgba(57,255,182,.26), transparent 50%);
-      animation: float 22s ease-in-out infinite alternate;
+        radial-gradient(circle at 25% 30%, rgba(83,215,255,.36), transparent 55%),
+        radial-gradient(circle at 75% 70%, rgba(168,139,255,.32), transparent 55%),
+        radial-gradient(circle at 50% 10%, rgba(57,255,182,.22), transparent 55%);
     }
     .mesh::after{
-      animation: float 30s ease-in-out infinite alternate-reverse; mix-blend-mode: screen; opacity: .12;
+      opacity: .12;
       background:
         radial-gradient(circle at 80% 20%, rgba(255,138,76,.22), transparent 60%),
         radial-gradient(circle at 20% 80%, rgba(255,107,157,.18), transparent 60%);
     }
-    @keyframes float{ 0%{transform:translate3d(-2%,-1%,0) scale(1.01)} 50%{transform:translate3d(1%,1%,0) scale(1.05)} 100%{transform:translate3d(2%,1%,0) scale(1.02)} }
 
-    .wrap{ max-width:1120px; margin:0 auto; padding: clamp(12px, 2.5vw, 24px); position: relative;
-      padding-top: calc(clamp(16px, 3vw, 24px) + env(safe-area-inset-top, 0)); }
+    .wrap{
+      max-width:1120px;
+      margin:0 auto;
+      padding: clamp(12px, 2.5vw, 24px);
+      position: relative;
+      padding-top: calc(clamp(16px, 3vw, 24px) + env(safe-area-inset-top, 0));
+    }
 
-    header{ text-align:center; padding: clamp(16px, 3vw, 24px) 0 clamp(18px, 3vw, 28px); position:relative; }
+    header{
+      text-align:center;
+      padding: clamp(16px, 3vw, 24px) 0 clamp(10px, 2.6vw, 18px);
+      position:relative;
+    }
     .brand{
-      display:inline-flex; align-items:center; justify-content:center; width:64px; height:64px; margin:0 auto 10px; border-radius:16px; position:relative; overflow:hidden;
-      background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
-      border: 1px solid var(--border-light); box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255,255,255,.06);
-      animation: brandPulse 3s ease-in-out infinite;
+      display:inline-flex; align-items:center; justify-content:center;
+      width:64px; height:64px;
+      margin:0 auto 10px;
+      border-radius:16px;
+      position:relative; overflow:hidden;
+      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(11,17,27,.98));
+      border: 1px solid var(--border-light);
+      box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255,255,255,.06);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .brand:hover{
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 12px 30px rgba(83,215,255,.25);
     }
     .brand::before{
-      content: ""; position: absolute; inset: -2px; border-radius: inherit; background: linear-gradient(135deg, var(--cyan), var(--green), var(--violet));
-      z-index: -1; opacity: .5; filter: blur(8px);
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: linear-gradient(135deg, var(--cyan), var(--green), var(--violet));
+      z-index: -1;
+      opacity: .5;
+      filter: blur(10px);
     }
     .brand img{ width:100%; height:100%; object-fit: cover; border-radius: inherit; }
-    @keyframes brandPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
 
     .tag{
-      display:inline-flex; align-items:center; gap:.5rem; padding:.28rem .7rem; border:1px solid var(--border-light); border-radius:999px;
-      font-size:.8rem; font-weight: 500; color:var(--muted-light);
-      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(10,18,32,.95));
-      backdrop-filter: blur(10px);
+      display:inline-flex;
+      align-items:center;
+      gap:.5rem;
+      padding:.28rem .7rem;
+      border:1px solid var(--border-light);
+      border-radius:999px;
+      font-size:.8rem;
+      font-weight: 500;
+      color:var(--muted-light);
+      background: linear-gradient(135deg, rgba(15,22,37,.95), rgba(10,18,32,.98));
       box-shadow: 0 3px 10px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.08);
-      margin-bottom: .5rem; animation: tagSlide 0.8s ease-out 0.2s both;
+      margin-bottom: .7rem;
+      animation: tagSlide 0.7s ease-out 0.18s both;
     }
-    .tag i{ width:.6rem; height:.6rem; border-radius:50%; display:inline-block;
+    .tag i{
+      width:.6rem;
+      height:.6rem;
+      border-radius:50%;
+      display:inline-block;
       background: radial-gradient(circle at 30% 30%, var(--cyan), var(--green) 70%);
-      animation: tagGlow 2s ease-in-out infinite alternate;
     }
-    @keyframes tagSlide { from{opacity:0; transform:translateY(-20px)} to{opacity:1; transform:translateY(0)} }
-    @keyframes tagGlow { 0%{box-shadow:0 0 5px rgba(83,215,255,.3)} 100%{box-shadow:0 0 15px rgba(83,215,255,.6)} }
+    @keyframes tagSlide { from{opacity:0; transform:translateY(-18px)} to{opacity:1; transform:translateY(0)} }
 
     h1{
-      margin:.4rem 0 0; font-weight:900; font-size:clamp(1.8rem, 5.5vw, 3.2rem); line-height:1.08; letter-spacing:.6px;
+      margin:.4rem 0 0;
+      font-weight:900;
+      font-size:clamp(1.8rem, 5.5vw, 3.1rem);
+      line-height:1.08;
+      letter-spacing:.6px;
       background: linear-gradient(135deg, var(--cyan) 0%, var(--green) 30%, var(--violet) 70%, var(--pink) 100%);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      text-shadow: 0 0 30px rgba(83,215,255,.25); animation: titleGlow 4s ease-in-out infinite alternate;
+      -webkit-background-clip:text; background-clip:text;
+      color:transparent;
+      text-shadow: 0 0 24px rgba(83,215,255,.22);
     }
-    @keyframes titleGlow { 0% { filter: brightness(1); } 100% { filter: brightness(1.2); } }
 
-    .sub{ margin: .6rem auto 0; max-width: 560px; color:var(--ink-soft); font-size: clamp(.96rem, 1.5vw, 1.06rem);
-      line-height: 1.5; opacity: .92; animation: fadeInUp 0.8s ease-out 0.4s both; }
-
-    /* Time and Weather Widget */
-    .widget-container { display: flex; gap: 12px; margin: 20px 0; opacity: 0; transform: translateY(20px); animation: fadeInUp 0.6s ease-out 0.5s forwards; }
-    .time-widget, .weather-widget {
-      flex: 1; padding: 16px; background: linear-gradient(135deg, rgba(15,22,37,.8), rgba(11,17,27,.9));
-      border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); text-align: center; transition: all 0.3s ease;
+    .sub{
+      margin: .6rem auto 0;
+      max-width: 560px;
+      color:var(--ink-soft);
+      font-size: clamp(.96rem, 1.5vw, 1.06rem);
+      line-height: 1.5;
+      opacity: .92;
+      animation: fadeInUp 0.7s ease-out 0.3s both;
     }
-    .time-widget:hover, .weather-widget:hover { transform: translateY(-2px); border-color: var(--cyan); box-shadow: 0 8px 25px rgba(83,215,255,.15); }
+
+    /* Toolbar: search + view toggle (เบา ๆ) */
+    .toolbar{
+      margin-top: 16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+      align-items:center;
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+    .search-box{
+      position:relative;
+      min-width: min(100%, 320px);
+      max-width: 360px;
+    }
+    .search-input{
+      width:100%;
+      padding: 8px 32px 8px 32px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(6,10,18,.9);
+      color:var(--ink);
+      font-size:.88rem;
+      outline:none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background 0.2s ease;
+    }
+    .search-input::placeholder{ color:var(--muted); }
+    .search-input:focus{
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 1px rgba(83,215,255,.4);
+      background: rgba(9,14,22,.98);
+    }
+    .search-icon{
+      position:absolute; left:10px; top:50%; transform:translateY(-50%);
+      width:16px; height:16px;
+      opacity:.7;
+    }
+    .search-clear{
+      position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      width:20px; height:20px;
+      border-radius:50%;
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      cursor:pointer;
+      font-size:14px;
+      display:none;
+      align-items:center; justify-content:center;
+      padding:0;
+    }
+    .search-clear.show{ display:flex; }
+
+    .view-toggle{
+      display:flex;
+      gap:6px;
+      padding:3px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(7,11,18,.92);
+    }
+    .view-btn{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      font-size:0.8rem;
+      padding:5px 10px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:500;
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .view-btn.active{
+      background:linear-gradient(135deg, var(--cyan), var(--green));
+      color:var(--bg-0);
+    }
+
+    /* Time & (optional) weather widget */
+    .widget-container {
+      display: flex;
+      gap: 12px;
+      margin: 18px 0 12px;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: fadeInUp 0.6s ease-out 0.5s forwards;
+    }
+    .time-widget,
+    .weather-widget {
+      flex: 1;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, rgba(15,22,37,.94), rgba(11,17,27,.98));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .time-widget:hover,
+    .weather-widget:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      box-shadow: 0 10px 24px rgba(83,215,255,.16);
+    }
     .time-display { font-size: 1.5rem; font-weight: 700; color: var(--cyan); margin-bottom: 4px; }
     .date-display { font-size: 0.9rem; color: var(--muted); }
     .weather-display { font-size: 1.2rem; font-weight: 600; color: var(--green); margin-bottom: 4px; }
     .weather-desc { font-size: 0.8rem; color: var(--muted); }
 
     .grid{
-      margin-top: clamp(20px, 3.5vw, 32px);
-      display:grid; gap: clamp(12px, 1.8vw, 18px);
+      margin-top: clamp(18px, 3vw, 26px);
+      display:grid;
+      gap: clamp(12px, 1.8vw, 18px);
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     }
 
     a.card{
-      display: flex; padding: clamp(14px, 2vw, 18px);
+      display: flex;
+      padding: clamp(14px, 2vw, 18px);
       border-radius: 16px;
-      background: linear-gradient(135deg, rgba(15,22,37,.88), rgba(11,17,27,.94));
+      background: linear-gradient(135deg, rgba(15,22,37,.96), rgba(11,17,27,.99));
       border: 1px solid var(--border);
-      text-decoration: none; color: inherit; position: relative;
-      transition: all .25s cubic-bezier(.4,0,.2,1);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 3px 10px rgba(0,0,0,.14);
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), background 0.22s ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,.18);
       min-height: 96px;
-      will-change: transform; transform: translateZ(0);
-      animation: fadeInUp 0.48s ease-out forwards; overflow: hidden;
+      overflow: hidden;
+      animation: fadeInUp 0.48s ease-out forwards;
     }
-    .card:nth-child(1){ animation-delay: .08s } .card:nth-child(2){ animation-delay: .12s }
-    .card:nth-child(3){ animation-delay: .16s } .card:nth-child(4){ animation-delay: .20s }
-    .card:nth-child(5){ animation-delay: .24s } .card:nth-child(6){ animation-delay: .28s }
-    .card:nth-child(7){ animation-delay: .32s } .card:nth-child(8){ animation-delay: .36s } .card:nth-child(9){ animation-delay: .40s }
+    .card:nth-child(1){ animation-delay: .08s }
+    .card:nth-child(2){ animation-delay: .12s }
+    .card:nth-child(3){ animation-delay: .16s }
+    .card:nth-child(4){ animation-delay: .20s }
+    .card:nth-child(5){ animation-delay: .24s }
+    .card:nth-child(6){ animation-delay: .28s }
+    .card:nth-child(7){ animation-delay: .32s }
+    .card:nth-child(8){ animation-delay: .36s }
+    .card:nth-child(9){ animation-delay: .40s }
+    .card:nth-child(10){ animation-delay: .44s }
 
     a.card::before{
-      content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none; z-index:-1;
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:inherit;
+      pointer-events:none;
+      z-index:-1;
       background: radial-gradient(240px 240px at var(--mx,50%) var(--my,50%),
-        color-mix(in oklab, var(--glow) 36%, transparent), transparent 70%);
-      transition: opacity .25s ease; opacity:0;
+        color-mix(in oklab, var(--glow) 32%, transparent), transparent 72%);
+      opacity:0;
+      transition: opacity var(--transition-fast);
     }
-    a.card::after {
-      content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.1), transparent);
-      transition: left 0.5s ease;
+    a.card::after{
+      content: "";
+      position: absolute;
+      top: 0; left: -120%;
+      width: 80%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+      transition: transform 0.5s ease;
+      transform: translateX(0);
     }
-    .card:hover::after { left: 100%; }
 
     .card:hover{
       transform: translateY(-6px) scale(1.01);
       border-color: color-mix(in oklab, var(--glow) 45%, var(--border));
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--glow) 26%, transparent),
-                  0 16px 38px color-mix(in oklab, var(--glow) 16%, rgba(0,0,0,.28)), var(--shadow-lg);
+      box-shadow: 0 0 0 1px color-mix(in oklab, var(--glow) 22%, transparent),
+                  0 16px 34px color-mix(in oklab, var(--glow) 16%, rgba(0,0,0,.3)),
+                  var(--shadow-lg);
+      background: linear-gradient(135deg, rgba(16,25,41,1), rgba(10,18,32,1));
     }
-    .card:hover::before{ opacity:.7 }
+    .card:hover::before{ opacity:.75 }
+    .card:hover::after{ transform: translateX(220%); }
 
     .ico{
-      width:46px; height:46px; border-radius:14px; display:grid; place-items:center;
+      width:46px; height:46px; border-radius:14px;
+      display:grid; place-items:center;
       background: linear-gradient(135deg,
-        color-mix(in oklab, var(--glow) 25%, rgba(15,22,37,.9)),
-        color-mix(in oklab, var(--glow) 15%, rgba(10,18,32,.95)));
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--glow) 38%, rgba(255,255,255,.1)),
-                  0 0 18px color-mix(in oklab, var(--glow) 22%, transparent),
-                  0 3px 7px rgba(0,0,0,.2);
-      position: relative; transition: all 0.3s ease;
+        color-mix(in oklab, var(--glow) 25%, rgba(15,22,37,.96)),
+        color-mix(in oklab, var(--glow) 15%, rgba(10,18,32,.99)));
+      box-shadow:
+        inset 0 0 0 1px color-mix(in oklab, var(--glow) 32%, rgba(255,255,255,.1)),
+        0 0 16px color-mix(in oklab, var(--glow) 18%, transparent),
+        0 3px 7px rgba(0,0,0,.25);
+      position: relative;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
-    .ico svg{ width:22px; height:22px; stroke: var(--ink); opacity:.95; transition: all 0.3s ease; }
-    .card:hover .ico { transform: scale(1.1) rotate(5deg); }
+    .ico svg{ width:22px; height:22px; stroke: var(--ink); opacity:.95; transition: stroke 0.25s ease; }
+    .card:hover .ico { transform: scale(1.08) rotate(4deg); }
     .card:hover .ico svg { stroke: var(--glow); }
 
-    .title{ font-weight:700; font-size: 1.02rem; letter-spacing:.25px; margin-top:6px; color: var(--ink); }
-    .desc{ color:var(--muted-light); font-size:.9rem; margin-top: 3px; line-height: 1.35; }
+    .title{
+      font-weight:700;
+      font-size: 1.02rem;
+      letter-spacing:.25px;
+      margin-top:6px;
+      color: var(--ink);
+    }
+    .desc{
+      color:var(--muted-light);
+      font-size:.9rem;
+      margin-top: 3px;
+      line-height: 1.35;
+    }
 
     .arrow{
-      margin-left:auto; width:28px; height:28px; border-radius:10px; display:grid; place-items:center;
+      margin-left:auto;
+      width:28px; height:28px;
+      border-radius:10px;
+      display:grid; place-items:center;
       border:1px solid var(--border-light);
       background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      transition: all .25s cubic-bezier(.4,0,.2,1);
-      backdrop-filter: blur(6px);
+      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), background 0.2s ease;
     }
     .card:hover .arrow{
       transform: translateX(5px) scale(1.06);
       border-color: color-mix(in oklab, var(--glow) 55%, var(--border));
       box-shadow: 0 0 12px color-mix(in oklab, var(--glow) 30%, transparent);
+      background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
     }
     .arrow svg{ width: 14px; height: 14px; stroke: var(--ink-soft); stroke-width: 2; }
 
     .row{ display:flex; align-items:center; gap:14px; width: 100%; }
     .spacer{ flex:1 }
-    a.card:focus-visible{ outline: 2px solid var(--blue); outline-offset: 3px; transform: translateY(-4px) scale(1.005); }
+
+    a.card:focus-visible{
+      outline: 2px solid var(--blue);
+      outline-offset: 3px;
+      transform: translateY(-4px) scale(1.01);
+    }
 
     /* Notification Toast */
     .toast {
-      position: fixed; top: 20px; right: 20px; padding: 16px 20px;
+      position: fixed;
+      top: 20px; right: 20px;
+      padding: 12px 16px;
       background: linear-gradient(135deg, var(--green), var(--cyan));
-      color: var(--bg-0); border-radius: 12px; font-weight: 600;
-      box-shadow: 0 8px 25px rgba(57,255,182,.3); transform: translateX(400px);
-      transition: transform 0.3s ease; z-index: 1001;
+      color: var(--bg-0);
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      box-shadow: 0 8px 22px rgba(57,255,182,.32);
+      transform: translateX(380px);
+      transition: transform 0.28s ease;
+      z-index: 1001;
+      max-width: 260px;
     }
     .toast.show { transform: translateX(0); }
 
     /* Scroll to Top Button */
     .scroll-top {
-      position: fixed; bottom: 90px; right: 20px; width: 48px; height: 48px; border-radius: 50%;
+      position: fixed;
+      bottom: 90px; right: 20px;
+      width: 48px; height: 48px;
+      border-radius: 50%;
       background: linear-gradient(135deg, var(--blue), var(--violet));
-      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      opacity: 0; transform: translateY(20px); transition: all 0.3s ease; z-index: 999;
+      border: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.2s ease;
+      z-index: 999;
     }
     .scroll-top.show { opacity: 1; transform: translateY(0); }
-    .scroll-top:hover { transform: translateY(-3px) scale(1.1); box-shadow: 0 8px 25px rgba(76,121,255,.3); }
+    .scroll-top:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(76,121,255,.3);
+    }
     .scroll-top svg { width: 20px; height: 20px; stroke: white; stroke-width: 2; }
 
     footer{
-      color:var(--muted); text-align:center; margin: 28px 0 16px; font-size:.88rem; font-weight: 400; opacity: .85;
-      padding-bottom: env(safe-area-inset-bottom, 16px); animation: fadeInUp 0.8s ease-out 0.6s both;
+      color:var(--muted);
+      text-align:center;
+      margin: 28px 0 16px;
+      font-size:.88rem;
+      font-weight: 400;
+      opacity: .85;
+      padding-bottom: env(safe-area-inset-bottom, 16px);
+      animation: fadeInUp 0.7s ease-out 0.55s both;
     }
 
     @media (prefers-reduced-motion: reduce){
       .mesh::before,.mesh::after{ animation:none }
       .card, .arrow, .install-btn, .brand, .tag i, h1{ transition: none; animation: none; }
     }
+
     @media (max-width:768px){
-      .mesh::before,.mesh::after{ filter: blur(36px); opacity: .14; }
+      .mesh::before,.mesh::after{ filter: blur(26px); opacity: .14; }
       .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
       .brand{ width:60px; height:60px; }
       .install-container { bottom: 12px; right: 12px; }
@@ -356,6 +626,7 @@
       header{ padding: clamp(12px, 2.5vw, 18px) 0 clamp(16px, 2.5vw, 22px); }
       .widget-container { flex-direction: column; }
       .stats-container { grid-template-columns: repeat(2, 1fr); }
+      .toolbar{ flex-direction:column; }
     }
     @media (max-width:480px){
       h1{ font-size: clamp(1.6rem, 7vw, 2.2rem) }
@@ -370,26 +641,35 @@
       .brand{ width:56px; height:56px; margin-bottom: 8px; }
       .fab { width: 52px; height: 52px; }
       .quick-action { width: 44px; height: 44px; }
-      .toast { top: 16px; right: 16px; font-size: 0.9rem; }
+      .toast { top: 16px; right: 16px; font-size: 0.86rem; }
     }
     @media (hover: none){
-      .card:hover{ transform: translateY(-3px) scale(1.005); box-shadow: var(--shadow-lg); }
+      .card:hover{
+        transform: translateY(-3px) scale(1.005);
+        box-shadow: var(--shadow-lg);
+      }
       .card:hover::before{ opacity:.45 }
       .card:hover .arrow{ transform: translateX(3px); }
       .card:hover .ico { transform: scale(1.05); }
     }
+
     @supports (padding: max(0px)){
-      body{ padding-bottom:max(16px, env(safe-area-inset-bottom)); padding-top:max(0px, env(safe-area-inset-top)); }
+      body{
+        padding-bottom:max(16px, env(safe-area-inset-bottom));
+        padding-top:max(0px, env(safe-area-inset-top));
+      }
     }
+
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ================= In-App Viewer (Overlay) ================= */
     .viewer {
-      position: fixed; inset: 0;
-      display: none; grid-template-rows: auto 1fr;
-      /* FIX: make overlay exactly viewport height (no URL bar jump) */
-      height: 100vh; height: 100dvh; height: 100svh; height: calc(var(--vh, 1vh) * 100);
-      background: linear-gradient(135deg, color-mix(in oklab, var(--bg-1) 88%, #000), rgba(0,0,0,.35));
+      position: fixed;
+      inset: 0;
+      display: none;
+      grid-template-rows: auto 1fr;
+      height: 100vh; height: 100dvh; height: 100svh;
+      background: linear-gradient(135deg, color-mix(in oklab, var(--bg-1) 94%, #000), rgba(0,0,0,.35));
       backdrop-filter: blur(8px);
       z-index: 1002;
       overflow: hidden;
@@ -397,66 +677,90 @@
     }
     .viewer.show { display: grid; }
 
-    /* NEW: Auto-fullscreen mode for mobile */
-    .viewer.fullscreen {
-      grid-template-rows: 1fr;
-    }
-    .viewer.fullscreen .viewer-header {
-      display: none;
-    }
+    .viewer.fullscreen { grid-template-rows: 1fr; }
+    .viewer.fullscreen .viewer-header { display: none; }
 
     .viewer-header{
-      display:flex; align-items:center; gap:10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
       padding: clamp(10px,2.2vw,14px);
-      background: linear-gradient(180deg, rgba(15,22,37, .92), rgba(11,17,27, .88));
+      background: linear-gradient(180deg, rgba(15,22,37, .96), rgba(11,17,27, .92));
       border-bottom: 1px solid var(--border);
       position: relative;
       z-index: 1003;
     }
     .viewer-app-ico{
-      width:32px; height:32px; border-radius:10px; display:grid; place-items:center;
+      width:32px; height:32px;
+      border-radius:10px;
+      display:grid; place-items:center;
       background: linear-gradient(135deg, rgba(83,215,255,.18), rgba(168,139,255,.12));
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
     }
     .viewer-title{ font-weight:700; letter-spacing:.3px; }
     .viewer-actions{ margin-left:auto; display:flex; gap:8px; }
     .btn{
-      height:34px; padding:0 12px; border-radius:10px; display:inline-flex; align-items:center; gap:8px;
+      height:34px;
+      padding:0 12px;
+      border-radius:10px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid var(--border-light); color:var(--ink); cursor:pointer; font-weight:600;
-      transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease;
-      backdrop-filter: blur(8px);
+      border:1px solid var(--border-light);
+      color:var(--ink);
+      cursor:pointer;
+      font-weight:600;
+      transition: transform .12s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
     }
-    .btn:hover{ transform: translateY(-1px); border-color: var(--cyan); box-shadow: 0 6px 18px rgba(83,215,255,.18); }
+    .btn:hover{
+      transform: translateY(-1px);
+      border-color: var(--cyan);
+      box-shadow: 0 6px 18px rgba(83,215,255,.18);
+      background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.06));
+    }
     .btn svg{ width:16px; height:16px; stroke: currentColor; }
 
     .viewer-body{
       position: relative;
       height: 100%;
-      overflow: hidden; /* FIX: prevent inner overflow while loading */
+      overflow: hidden;
       contain: layout paint size;
     }
     .viewer-iframe{
       display:block;
       width:100%;
-      height:100%; /* FIX: fill viewer-body instead of 100dvh - 64px */
-      border:0; background: #0b111b;
+      height:100%;
+      border:0;
+      background: #0b111b;
     }
     .viewer-loader{
-      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;
-      background: linear-gradient(135deg, rgba(11,17,27,.55), rgba(15,22,37,.35)); opacity:0; transition: opacity .25s ease;
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      background: linear-gradient(135deg, rgba(11,17,27,.55), rgba(15,22,37,.35));
+      opacity:0;
+      transition: opacity .25s ease;
     }
     .viewer-loader.show{ opacity:1; }
     .viewer-msg{
-      position:absolute; left:50%; top:18px; transform: translateX(-50%);
+      position:absolute;
+      left:50%; top:18px;
+      transform: translateX(-50%);
       background: linear-gradient(135deg, rgba(255,87,87,.12), rgba(255,217,61,.10));
       border:1px solid color-mix(in oklab, var(--yellow) 35%, rgba(255,255,255,.06));
-      padding:8px 12px; border-radius:10px; color: var(--ink-soft); font-size:.9rem; display:none;
-      backdrop-filter: blur(6px);
+      padding:8px 12px;
+      border-radius:10px;
+      color: var(--ink-soft);
+      font-size:.9rem;
+      display:none;
     }
     .viewer-msg.show{ display:block; }
 
-    /* NEW: Floating controls for fullscreen mode */
+    /* Floating controls for fullscreen mode */
     .floating-controls {
       position: absolute;
       top: 20px;
@@ -467,31 +771,27 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-    .viewer.fullscreen .floating-controls {
-      display: flex;
-    }
+    .viewer.fullscreen .floating-controls { display: flex; }
     .viewer.fullscreen:hover .floating-controls,
-    .floating-controls:hover {
-      opacity: 1;
-    }
+    .floating-controls:hover { opacity: 1; }
     .floating-btn {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(11,17,27,.95));
+      background: linear-gradient(135deg, rgba(15,22,37,.95), rgba(11,17,27,.98));
       border: 1px solid var(--border-light);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
       box-shadow: 0 4px 12px rgba(0,0,0,.3);
     }
     .floating-btn:hover {
-      transform: scale(1.1);
+      transform: scale(1.08);
       border-color: var(--cyan);
       box-shadow: 0 0 20px rgba(83,215,255,.3);
+      background: linear-gradient(135deg, rgba(17,26,43,1), rgba(11,17,27,1));
     }
     .floating-btn svg {
       width: 18px;
@@ -499,67 +799,78 @@
       stroke: var(--ink-soft);
     }
 
-    /* NEW: Swipe gesture indicator */
+    /* Swipe gesture indicator */
     .swipe-indicator {
       position: absolute;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: linear-gradient(135deg, rgba(15,22,37,.9), rgba(11,17,27,.95));
+      background: linear-gradient(135deg, rgba(15,22,37,.95), rgba(11,17,27,.98));
       border: 1px solid var(--border-light);
       padding: 8px 16px;
       border-radius: 20px;
       font-size: 0.8rem;
       color: var(--muted);
-      backdrop-filter: blur(10px);
       opacity: 0;
       transition: opacity 0.3s ease;
       pointer-events: none;
     }
-    .viewer.fullscreen .swipe-indicator {
-      opacity: 1;
+    .viewer.fullscreen .swipe-indicator { opacity: 1; }
+
+    @media (max-width: 768px) {
+      .viewer-header { padding: 8px 12px; }
+      .btn { height: 32px; padding: 0 10px; font-size: 0.85rem; }
+      .btn svg { width: 14px; height: 14px; }
+      .floating-controls { top: 15px; right: 15px; gap: 6px; }
+      .floating-btn { width: 36px; height: 36px; }
+      .floating-btn svg { width: 16px; height: 16px; }
     }
 
-    /* NEW: Mobile-specific styles */
-    @media (max-width: 768px) {
-      .viewer-header {
-        padding: 8px 12px;
-      }
-      .btn {
-        height: 32px;
-        padding: 0 10px;
-        font-size: 0.85rem;
-      }
-      .btn svg {
-        width: 14px;
-        height: 14px;
-      }
-      .floating-controls {
-        top: 15px;
-        right: 15px;
-        gap: 6px;
-      }
-      .floating-btn {
-        width: 36px;
-        height: 36px;
-      }
-      .floating-btn svg {
-        width: 16px;
-        height: 16px;
-      }
+    /* ================= Performance mode (ลด effect หนัก ๆ) ================= */
+    .perf-mode .mesh{ display:none; }
+
+    .perf-mode .brand,
+    .perf-mode .tag,
+    .perf-mode h1,
+    .perf-mode .card,
+    .perf-mode .stats-container,
+    .perf-mode .widget-container{
+      animation:none !important;
+    }
+
+    .perf-mode .card,
+    .perf-mode .stat-card,
+    .perf-mode .time-widget,
+    .perf-mode .weather-widget,
+    .perf-mode .toast,
+    .perf-mode .install-btn,
+    .perf-mode .fab,
+    .perf-mode .quick-action,
+    .perf-mode .viewer,
+    .perf-mode .btn,
+    .perf-mode .floating-btn {
+      box-shadow: 0 3px 10px rgba(0,0,0,.35);
+      backdrop-filter:none !important;
+    }
+
+    .perf-mode .card:hover{
+      transform: translateY(-4px);
+      box-shadow: 0 8px 18px rgba(0,0,0,.45);
     }
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
-  <div class="loading-screen" id="loadingScreen"><div class="loading-spinner"></div></div>
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-spinner"></div>
+  </div>
 
   <!-- Status bar for PWA -->
   <div class="status-bar"></div>
 
   <!-- Floating Action Button -->
   <div class="fab-container">
-    <button class="fab" id="fabBtn">
+    <button class="fab" id="fabBtn" aria-label="Quick actions">
       <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
     </button>
     <div class="quick-actions" id="quickActions">
@@ -567,10 +878,23 @@
         <svg viewBox="0 0 24 24" fill="none"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       </div>
       <div class="quick-action" onclick="shareApp()" title="Share App">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+          <polyline points="16,6 12,2 8,6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="quick-action" onclick="togglePerformanceMode()" title="Performance Mode">
+        <svg viewBox="0 0 24 24" fill="none">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
       </div>
       <div class="quick-action" onclick="showInfo()" title="App Info">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4"/>
+          <path d="M12 8h.01"/>
+        </svg>
       </div>
     </div>
   </div>
@@ -584,7 +908,7 @@
   </div>
 
   <!-- Scroll to Top Button -->
-  <button class="scroll-top" id="scrollTopBtn">
+  <button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">
     <svg viewBox="0 0 24 24" fill="none"><path d="M18 15l-6-6-6 6"/></svg>
   </button>
 
@@ -592,18 +916,37 @@
   <div class="toast" id="toast"></div>
 
   <div class="mesh" aria-hidden="true"></div>
+
   <div class="wrap">
     <header>
-      <div class="brand" aria-hidden="true"><img id="brandImg" alt="EBassWave Logo"></div>
+      <div class="brand" aria-hidden="true">
+        <img id="brandImg" alt="EBassWave Logo">
+      </div>
       <span class="tag" aria-label="AI style tag"><i></i> Modern • AI • Tech</span>
       <h1 aria-label="EBassWave AI Hub">EBassWave AI Hub</h1>
       <p class="sub">AI is Everything</p>
+
+      <!-- Toolbar: search + view buttons -->
+      <div class="toolbar" aria-label="App tools">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="#93a3b8" stroke-width="1.6"/>
+            <line x1="16" y1="16" x2="21" y2="21" stroke="#93a3b8" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <input id="appSearch" class="search-input" type="search" placeholder="ค้นหาแอปใน Hub..." aria-label="Search apps">
+          <button id="clearSearch" class="search-clear" type="button" aria-label="Clear search">×</button>
+        </div>
+        <div class="view-toggle" role="tablist" aria-label="App view">
+          <button class="view-btn active" data-view="all" type="button">ทั้งหมด</button>
+          <button class="view-btn" data-view="recent" type="button">ล่าสุด</button>
+        </div>
+      </div>
     </header>
 
     <!-- Stats Cards -->
     <div class="stats-container">
       <div class="stat-card">
-        <div class="stat-number" id="totalApps">9</div>
+        <div class="stat-number" id="totalApps">0</div>
         <div class="stat-label">Total Apps</div>
       </div>
       <div class="stat-card">
@@ -612,7 +955,7 @@
       </div>
     </div>
 
-    <!-- Time  -->
+    <!-- Time -->
     <div class="widget-container">
       <div class="time-widget">
         <div class="time-display" id="timeDisplay">--:--</div>
@@ -620,139 +963,177 @@
       </div>
     </div>
 
-<main class="grid" aria-label="Quick Links" id="appGrid">
-<!-- TAPro (PROD) -->
-<a class="card" href="https://basssg.github.io/AlphaSense-Analysis-Webapp/" style="--glow: var(--cyan)" aria-label="TAPro" data-name="TAPro" data-app="tapro">
-  <div class="row">
-    <div class="ico" aria-hidden="true">
-      <img src="https://s21-kling.klingai.com/kimg/EMXN1y8qeAoGdXBsb2FkEg55bGFiLXN0dW50LXNncBpec2UvYWlfcG9ydGFsX3NncF9tbXVfaW1nMmltZ19haXdlYl92MTVfcG9ydHJhaXQvY2ZmNGJjNjUtMDAyZS00OTRhLWEwNWMtNmU3YzI5NTBhYzYzX2ltYWdlLnBuZw:360x360.webp?x-kcdn-pid=112372" alt="TAPro" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
-    </div>
-    <div class="spacer">
-      <div class="title">TAPro</div>
-      <div class="desc">Automated Trading Analysis Platform</div>
-    </div>
-    <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-  </div>
-</a>
+    <main class="grid" aria-label="Quick Links" id="appGrid">
+      <!-- TAPro (PROD) -->
+      <a class="card" href="https://basssg.github.io/AlphaSense-Analysis-Webapp/" style="--glow: var(--cyan)" aria-label="TAPro" data-name="TAPro" data-app="tapro">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <img src="https://s21-kling.klingai.com/kimg/EMXN1y8qeAoGdXBsb2FkEg55bGFiLXN0dW50LXNncBpec2UvYWlfcG9ydGFsX3NncF9tbXVfaW1nMmltZ19haXdlYl92MTVfcG9ydHJhaXQvY2ZmNGJjNjUtMDAyZS00OTRhLWEwNWMtNmU3YzI5NTBhYzYzX2ltYWdlLnBuZw:360x360.webp?x-kcdn-pid=112372" alt="TAPro" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          </div>
+          <div class="spacer">
+            <div class="title">TAPro</div>
+            <div class="desc">Automated Trading Analysis Platform</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-<!-- TAPro - DEV -->
-<a class="card" href="https://basssg.github.io/TAPro-DEV/" style="--glow: var(--cyan)" aria-label="TAPro - DEV" data-name="TAPro - DEV" data-app="tapro-dev">
-  <div class="row">
-    <div class="ico" aria-hidden="true">
-      <img src="https://s15-kling.klingai.com/kimg/EMXN1y8qSQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBova2xpbmcvZG93bmxvYWQvTWpnMk5qa3dNalF4TXpJd05qVXhNamM0TnpFek5EWT0.origin?x-kcdn-pid=112372" alt="TAPro - DEV" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
-    </div>
-    <div class="spacer">
-      <div class="title">TAPro - DEV</div>
-      <div class="desc">Devoloping by DEV</div>
-    </div>
-    <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-  </div>
-</a>
+      <!-- TAPro - DEV -->
+      <a class="card" href="https://basssg.github.io/TAPro-DEV/" style="--glow: var(--cyan)" aria-label="TAPro - DEV" data-name="TAPro - DEV" data-app="tapro-dev">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <img src="https://s15-kling.klingai.com/kimg/EMXN1y8qSQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBova2xpbmcvZG93bmxvYWQvTWpnMk5qa3dNalF4TXpJd05qVXhNamM0TnpFek5EWT0.origin?x-kcdn-pid=112372" alt="TAPro - DEV" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          </div>
+          <div class="spacer">
+            <div class="title">TAPro - DEV</div>
+            <div class="desc">Developing by DEV</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-<!-- XAUUSD ( NEWS ) -->
-<a class="card" href="https://basssg.github.io/XAUUSD-NEWS/" style="--glow: var(--yellow)" aria-label="XAUUSD ( NEWS )" data-name="XAUUSD ( NEWS )" data-app="xauusd-news">
-  <div class="row">
-    <div class="ico" aria-hidden="true">
-      <img src="https://www.advfn.com/common/images/company/PM_XAUUSD.png" alt="XAUUSD News" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
-    </div>
-    <div class="spacer">
-      <div class="title">XAUUSD ( NEWS )</div>
-      <div class="desc">ข่าวสารทุกอย่างเกี่ยวกับทองคำ</div>
-    </div>
-    <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-  </div>
-</a>
+      <!-- XAUUSD ( NEWS ) -->
+      <a class="card" href="https://basssg.github.io/XAUUSD-NEWS/" style="--glow: var(--yellow)" aria-label="XAUUSD ( NEWS )" data-name="XAUUSD ( NEWS )" data-app="xauusd-news">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <img src="https://www.advfn.com/common/images/company/PM_XAUUSD.png" alt="XAUUSD News" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          </div>
+          <div class="spacer">
+            <div class="title">XAUUSD ( NEWS )</div>
+            <div class="desc">ข่าวสารทุกอย่างเกี่ยวกับทองคำ</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-<!-- Dashboard -->
-<a class="card" href="https://basssg.github.io/TAProAlert-Dashboard/" style="--glow: var(--violet)" aria-label="Dashboard" data-name="Dashboard" data-app="dashboard">
-  <div class="row">
-    <div class="ico" aria-hidden="true">
-      <img src="https://erpsoftwareblog.com/wp-content/uploads/financial-dashboards-icon-500-px2.png" alt="Dashboard" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
-    </div>
-    <div class="spacer">
-      <div class="title">Dashboard</div>
-      <div class="desc">System Metrics & Status Overview</div>
-    </div>
-    <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-  </div>
-</a>
+      <!-- Dashboard -->
+      <a class="card" href="https://basssg.github.io/TAProAlert-Dashboard/" style="--glow: var(--violet)" aria-label="Dashboard" data-name="Dashboard" data-app="dashboard">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <img src="https://erpsoftwareblog.com/wp-content/uploads/financial-dashboards-icon-500-px2.png" alt="Dashboard" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          </div>
+          <div class="spacer">
+            <div class="title">Dashboard</div>
+            <div class="desc">System Metrics & Status Overview</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-<!-- SnDFX -->
-<a class="card" href="https://basssg.github.io/SnDForex/" style="--glow: var(--green)" aria-label="SnDFX" data-name="SnDFX" data-app="sndfx">
-  <div class="row">
-    <div class="ico" aria-hidden="true">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhDT-JrEz9EfeCII6epmLPVCgVP5EPyHBU_w&s" alt="SnDFX" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
-    </div>
-    <div class="spacer">
-      <div class="title">SnDFX</div>
-      <div class="desc">Supply & Demand Zone Analysis</div>
-    </div>
-    <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-  </div>
-</a>
+      <!-- SnDFX -->
+      <a class="card" href="https://basssg.github.io/SnDForex/" style="--glow: var(--green)" aria-label="SnDFX" data-name="SnDFX" data-app="sndfx">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhDT-JrEz9EfeCII6epmLPVCgVP5EPyHBU_w&s" alt="SnDFX" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          </div>
+          <div class="spacer">
+            <div class="title">SnDFX</div>
+            <div class="desc">Supply & Demand Zone Analysis</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-  <a class="card" href="https://basssg.github.io/GoogleSheet/" style="--glow: var(--orange)" aria-label="GoogleSheet" data-name="GoogleSheet" data-app="googlesheet">
-    <div class="row">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></div>
-      <div class="spacer">
-        <div class="title">GoogleSheet</div>
-        <div class="desc">Enhanced Spreadsheet & Scripts</div>
-      </div>
-      <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-    </div>
-  </a>
+      <!-- GoogleSheet -->
+      <a class="card" href="https://basssg.github.io/GoogleSheet/" style="--glow: var(--orange)" aria-label="GoogleSheet" data-name="GoogleSheet" data-app="googlesheet">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
+            </svg>
+          </div>
+          <div class="spacer">
+            <div class="title">GoogleSheet</div>
+            <div class="desc">Enhanced Spreadsheet & Scripts</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-  <a class="card" href="https://basssg.github.io/GoogleAppScript/" style="--glow: var(--pink)" aria-label="Google App Script" data-name="Google App Script" data-app="gas">
-    <div class="row">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M9 7L5 12l4 5"/><path d="M15 7l4 5-4 5"/></svg></div>
-      <div class="spacer">
-        <div class="title">Google App Script</div>
-        <div class="desc">Automated Google Scripts</div>
-      </div>
-      <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-    </div>
-  </a>
+      <!-- Google App Script -->
+      <a class="card" href="https://basssg.github.io/GoogleAppScript/" style="--glow: var(--pink)" aria-label="Google App Script" data-name="Google App Script" data-app="gas">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <path d="M9 7L5 12l4 5"/>
+              <path d="M15 7l4 5-4 5"/>
+            </svg>
+          </div>
+          <div class="spacer">
+            <div class="title">Google App Script</div>
+            <div class="desc">Automated Google Scripts</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-<!-- Investment -->
-<a class="card" href="https://basssg.github.io/Investment/" style="--glow: var(--blue)" aria-label="Investment" data-name="Investment" data-app="investment">
-  <div class="row">
-    <div class="ico" aria-hidden="true">
-      <img src="https://t4.ftcdn.net/jpg/03/14/80/29/360_F_314802917_bokCMjUS5cbfgNNvQ7oChkBAYFtX3gJV.jpg" alt="Investment" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
-    </div>
-    <div class="spacer">
-      <div class="title">Investment</div>
-      <div class="desc">Portfolio & Investment Data</div>
-    </div>
-    <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-  </div>
-</a>
+      <!-- Investment -->
+      <a class="card" href="https://basssg.github.io/Investment/" style="--glow: var(--blue)" aria-label="Investment" data-name="Investment" data-app="investment">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <img src="https://t4.ftcdn.net/jpg/03/14/80/29/360_F_314802917_bokCMjUS5cbfgNNvQ7oChkBAYFtX3gJV.jpg" alt="Investment" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          </div>
+          <div class="spacer">
+            <div class="title">Investment</div>
+            <div class="desc">Portfolio & Investment Data</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-<!-- TripPlanner (URL sanitized) -->
-<a class="card" href="https://basssg.github.io/TripPlanner/" style="--glow: var(--green)" aria-label="TripPlanner" data-name="TripPlanner" data-app="tripplanner">
-  <div class="row">
-    <div class="ico" aria-hidden="true">
-      <img src="https://s21-kling.klingai.com/bs2/upload-ylab-stunt-sgp/se/ai_portal_sgp_mmu_txt2img_aiweb_v15/53e5aa90-d7b3-457c-8217-5266265c1a5a_image.png?x-kcdn-pid=112372" alt="TripPlanner" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
-    </div>
-    <div class="spacer">
-      <div class="title">TripPlanner</div>
-      <div class="desc">Smart Travel Planning Assistant</div>
-    </div>
-    <div class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-  </div>
-</a>
+      <!-- TripPlanner -->
+      <a class="card" href="https://basssg.github.io/TripPlanner/" style="--glow: var(--green)" aria-label="TripPlanner" data-name="TripPlanner" data-app="tripplanner">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <img src="https://s21-kling.klingai.com/bs2/upload-ylab-stunt-sgp/se/ai_portal_sgp_mmu_txt2img_aiweb_v15/53e5aa90-d7b3-457c-8217-5266265c1a5a_image.png?x-kcdn-pid=112372" alt="TripPlanner" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+          </div>
+          <div class="spacer">
+            <div class="title">TripPlanner</div>
+            <div class="desc">Smart Travel Planning Assistant</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
 
-  <a class="card" href="https://basssg.github.io/Pickup/" style="--glow: var(--cyan)" aria-label="PickUp" data-name="PickUp" data-app="pickup">
-    <div class="row">
-      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M3 15h2l2-3h6l2 3h4"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></div>
-      <div class="spacer">
-        <div class="title">PickUp</div>
-        <div class="desc">Real-time Pickup & Delivery System</div>
-      </div>
-      <div class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg></div>
-    </div>
-  </a>
-</main>
-
+      <!-- PickUp -->
+      <a class="card" href="https://basssg.github.io/Pickup/" style="--glow: var(--cyan)" aria-label="PickUp" data-name="PickUp" data-app="pickup">
+        <div class="row">
+          <div class="ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <path d="M3 15h2l2-3h6l2 3h4"/>
+              <circle cx="7" cy="18" r="2"/>
+              <circle cx="17" cy="18" r="2"/>
+            </svg>
+          </div>
+          <div class="spacer">
+            <div class="title">PickUp</div>
+            <div class="desc">Real-time Pickup & Delivery System</div>
+          </div>
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
+    </main>
 
     <footer>© <span id="y"></span> EBassWave AI Hub • Built for speed, clarity, and control</footer>
   </div>
@@ -763,20 +1144,35 @@
       <div class="viewer-app-ico" id="viewerIco" aria-hidden="true"></div>
       <div class="viewer-title" id="viewerTitle">Loading…</div>
       <div class="viewer-actions">
-        <button class="btn" id="btnReload" title="Reload">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        <button class="btn" id="btnReload" title="Reload" type="button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M23 4v6h-6"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
           Reload
         </button>
-        <button class="btn" id="btnFullscreen" title="Fullscreen">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        <button class="btn" id="btnFullscreen" title="Fullscreen" type="button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+            <path d="M16 3h3a2 2 0 0 1 2 2v3"/>
+            <path d="M8 21H5a2 2 0 0 1-2-2v-3"/>
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>
           Full
         </button>
-        <button class="btn" id="btnExternal" title="Open in new tab">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v7h-7"/></svg>
+        <button class="btn" id="btnExternal" title="Open in new tab" type="button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M14 3h7v7"/>
+            <path d="M10 14L21 3"/>
+            <path d="M21 14v7h-7"/>
+          </svg>
           New Tab
         </button>
-        <button class="btn" id="btnClose" title="Close">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+        <button class="btn" id="btnClose" title="Close" type="button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18"/>
+            <path d="M6 6l12 12"/>
+          </svg>
           Close
         </button>
       </div>
@@ -785,23 +1181,37 @@
       <iframe id="appFrame" class="viewer-iframe" allowfullscreen
               allow="fullscreen; clipboard-read; clipboard-write"
               referrerpolicy="no-referrer"></iframe>
-      <div class="viewer-loader" id="viewerLoader"><div class="loading-spinner"></div></div>
+      <div class="viewer-loader" id="viewerLoader">
+        <div class="loading-spinner"></div>
+      </div>
       <div class="viewer-msg" id="viewerMsg">This site may block embedding. Use "New Tab" if it doesn't load.</div>
-      
-      <!-- NEW: Floating controls for fullscreen mode -->
+
+      <!-- Floating controls -->
       <div class="floating-controls" id="floatingControls">
-        <button class="floating-btn" id="floatingReload" title="Reload">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        <button class="floating-btn" id="floatingReload" title="Reload" type="button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M23 4v6h-6"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
         </button>
-        <button class="floating-btn" id="floatingExternal" title="Open in new tab">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v7h-7"/></svg>
+        <button class="floating-btn" id="floatingExternal" title="Open in new tab" type="button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M14 3h7v7"/>
+            <path d="M10 14L21 3"/>
+            <path d="M21 14v7h-7"/>
+          </svg>
         </button>
-        <button class="floating-btn" id="floatingExit" title="Exit fullscreen">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+        <button class="floating-btn" id="floatingExit" title="Exit fullscreen" type="button">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
+            <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
+            <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
+            <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+          </svg>
         </button>
       </div>
 
-      <!-- NEW: Swipe indicator -->
+      <!-- Swipe indicator -->
       <div class="swipe-indicator" id="swipeIndicator">
         Swipe down to exit fullscreen
       </div>
@@ -809,107 +1219,245 @@
   </section>
 
   <script>
-    // ===================== ICON SOURCE (EXTERNAL) =====================
+    // ===================== ICON SOURCE =====================
     const ICON_URL = "https://s15-kling.klingai.com/kimg/EMXN1y8qTQoGdXBsb2FkEg55bGFiLXN0dW50LXNncBoza2xpbmcvZG93bmxvYWQvTWpnNE1qUXpPVFF3TXpBd01UUTJNVGt3TkRZMk5qTTRNUT09.origin?x-kcdn-pid=112372";
     document.getElementById('brandImg').src = ICON_URL;
 
-    // ===================== DEVICE DETECTION =====================
+    // ===================== DEVICE / PERFORMANCE DETECTION =====================
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isTouch = 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
 
-    // ===================== FULLSCREEN SETTINGS (NEW) =====================
-    const AUTO_FULL_ON_OPEN = true;            // เปิดแอปแล้วเข้า fullscreen (CSS) ทันที
-    const PREFER_BROWSER_FULLSCREEN = true;    // พยายามขอ Browser Fullscreen จริง ถ้าอนุญาต
+    const hardwareCores = navigator.hardwareConcurrency || 4;
+    const deviceMemory = navigator.deviceMemory || 4;
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const defaultAutoPerfMode = prefersReducedMotion || hardwareCores <= 4 || deviceMemory <= 2;
+
+    (function initPerformanceMode(){
+      let enabled = defaultAutoPerfMode;
+      try {
+        const saved = localStorage.getItem('ebass_perf_mode');
+        if (saved === '1') enabled = true;
+        else if (saved === '0') enabled = false;
+      } catch(e){}
+      if (enabled) document.documentElement.classList.add('perf-mode');
+    })();
+
+    // fullscreen settings (ลด real fullscreen อัตโนมัติ)
+    const AUTO_FULL_ON_OPEN = isMobile;     // auto CSS fullscreen เฉพาะมือถือ
+    const PREFER_BROWSER_FULLSCREEN = false; // ไม่ขอ browser fullscreen จริงโดยอัตโนมัติ
 
     // ===================== LOADING SCREEN =====================
     window.addEventListener('load', () => {
-      setTimeout(() => document.getElementById('loadingScreen').classList.add('hidden'), 1000);
+      setTimeout(() => {
+        const ls = document.getElementById('loadingScreen');
+        if (ls) ls.classList.add('hidden');
+      }, 600);
     });
-
-    // ===================== SESSION TRACKING (guard if element missing) =====================
-    let sessionStartTime = Date.now();
-    function updateSessionTime() {
-      const el = document.getElementById('sessionTime');
-      if (!el) return;
-      const elapsed = Date.now() - sessionStartTime;
-      const minutes = Math.floor(elapsed / 60000);
-      const seconds = Math.floor((elapsed % 60000) / 1000);
-      el.textContent = minutes > 0 ? `${minutes}m` : `${seconds}s`;
-    }
-    setInterval(updateSessionTime, 1000);
 
     // ===================== TIME & DATE =====================
     function updateTime() {
       const now = new Date();
       const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: false };
       const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('timeDisplay').textContent = now.toLocaleTimeString('en-US', timeOptions);
-      document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', dateOptions);
+      const timeEl = document.getElementById('timeDisplay');
+      const dateEl = document.getElementById('dateDisplay');
+      if (!timeEl || !dateEl) return;
+      timeEl.textContent = now.toLocaleTimeString(undefined, timeOptions);
+      dateEl.textContent = now.toLocaleDateString(undefined, dateOptions);
     }
     updateTime();
     setInterval(updateTime, 1000);
 
     // ===================== WEATHER (fallback only) =====================
-    function updateBangkokWeatherFallback(){ /* intentionally empty placeholder to avoid errors */ }
+    function updateBangkokWeatherFallback(){ /* no-op (เผื่อเรียกจาก FAB) */ }
+
+    // ===================== TOAST =====================
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
 
     // ===================== FAB =====================
     const fabBtn = document.getElementById('fabBtn');
     const quickActions = document.getElementById('quickActions');
     let fabOpen = false;
-    fabBtn.addEventListener('click', () => {
-      fabOpen = !fabOpen;
-      fabBtn.classList.toggle('active', fabOpen);
-      quickActions.classList.toggle('show', fabOpen);
-    });
-
-    function refreshWeather(){ updateBangkokWeatherFallback(); showToast('Weather refreshed for Bangkok!'); }
-    function shareApp(){
-      if (navigator.share) { navigator.share({ title:'EBassWave AI Hub', text:'Check out this amazing AI Hub!', url: location.href }); }
-      else { navigator.clipboard.writeText(location.href); showToast('Link copied to clipboard!'); }
+    if (fabBtn && quickActions) {
+      fabBtn.addEventListener('click', () => {
+        fabOpen = !fabOpen;
+        fabBtn.classList.toggle('active', fabOpen);
+        quickActions.classList.toggle('show', fabOpen);
+      });
     }
-    function showInfo(){ showToast('EBassWave AI Hub v2.0 - Your personal productivity hub'); }
 
-    // ===================== TOAST =====================
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+    function refreshWeather(){
+      updateBangkokWeatherFallback();
+      showToast('Weather refreshed for Bangkok!');
+    }
+    function shareApp(){
+      const shareData = {
+        title: 'EBassWave AI Hub',
+        text: 'EBassWave AI Hub - your personal AI & trading hub.',
+        url: location.href
+      };
+      if (navigator.share) {
+        navigator.share(shareData).catch(()=>{});
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(location.href).then(() => {
+          showToast('Link copied to clipboard!');
+        }).catch(() => {
+          showToast('Unable to copy link');
+        });
+      } else {
+        showToast('Share not supported on this device');
+      }
+    }
+    function showInfo(){
+      showToast('EBassWave AI Hub v2.1 • Optimized for speed & low resources');
+    }
+    function togglePerformanceMode() {
+      const root = document.documentElement;
+      const enabled = !root.classList.contains('perf-mode');
+      root.classList.toggle('perf-mode', enabled);
+      try {
+        localStorage.setItem('ebass_perf_mode', enabled ? '1' : '0');
+      } catch(e){}
+      showToast(enabled ? '⚡ Performance mode: ON' : 'Performance mode: OFF');
     }
 
     // ===================== SCROLL TO TOP =====================
     const scrollTopBtn = document.getElementById('scrollTopBtn');
     window.addEventListener('scroll', () => {
-      if (window.pageYOffset > 300) scrollTopBtn.classList.add('show'); else scrollTopBtn.classList.remove('show');
+      if (!scrollTopBtn) return;
+      if (window.pageYOffset > 300) scrollTopBtn.classList.add('show');
+      else scrollTopBtn.classList.remove('show');
     });
-    scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    if (scrollTopBtn) {
+      scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+
+    // ===================== SEARCH & VIEW FILTER =====================
+    (function initSearchAndFilter(){
+      const searchInput = document.getElementById('appSearch');
+      const clearBtn = document.getElementById('clearSearch');
+      const viewButtons = document.querySelectorAll('.view-btn');
+      const cards = Array.from(document.querySelectorAll('#appGrid a.card'));
+      if (!cards.length) return;
+
+      // recent tracking
+      let recentAppSlugs = [];
+      try {
+        const saved = localStorage.getItem('ebass_recent_apps');
+        if (saved) recentAppSlugs = JSON.parse(saved);
+      } catch(e){ recentAppSlugs = []; }
+
+      function saveRecentSlug(slug) {
+        if (!slug) return;
+        const idx = recentAppSlugs.indexOf(slug);
+        if (idx !== -1) recentAppSlugs.splice(idx, 1);
+        recentAppSlugs.unshift(slug);
+        if (recentAppSlugs.length > 8) recentAppSlugs.length = 8;
+        try {
+          localStorage.setItem('ebass_recent_apps', JSON.stringify(recentAppSlugs));
+        } catch(e){}
+      }
+
+      // expose for viewer logic
+      window._ebass_saveRecentSlug = saveRecentSlug;
+
+      function applyFilters(){
+        const term = (searchInput?.value || '').trim().toLowerCase();
+        const activeViewBtn = Array.from(viewButtons).find(b => b.classList.contains('active'));
+        const view = activeViewBtn ? activeViewBtn.dataset.view : 'all';
+
+        cards.forEach(card => {
+          const name = (card.dataset.name || card.getAttribute('aria-label') || '').toLowerCase();
+          const desc = (card.querySelector('.desc')?.textContent || '').toLowerCase();
+          const slug = (card.dataset.app || name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+
+          let visible = true;
+
+          if (term && !(name.includes(term) || desc.includes(term))) visible = false;
+
+          if (view === 'recent') {
+            visible = visible && recentAppSlugs.includes(slug);
+          }
+
+          card.style.display = visible ? '' : 'none';
+        });
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          if (clearBtn) {
+            clearBtn.classList.toggle('show', !!searchInput.value);
+          }
+          applyFilters();
+        });
+      }
+      if (clearBtn && searchInput) {
+        clearBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          clearBtn.classList.remove('show');
+          applyFilters();
+          searchInput.focus();
+        });
+      }
+
+      viewButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          viewButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          applyFilters();
+        });
+      });
+
+      applyFilters();
+    })();
 
     // ===================== STATS =====================
     function animateStats() {
-      const total = document.querySelectorAll('#appGrid a.card').length;
+      const cards = document.querySelectorAll('#appGrid a.card');
+      const totalApps = cards.length;
+      const el = document.getElementById('totalApps');
+      if (!el) return;
       let count = 0;
+      const step = Math.max(1, Math.floor(totalApps / 10));
       const timer = setInterval(() => {
-        count++;
-        document.getElementById('totalApps').textContent = count;
-        if (count >= total) clearInterval(timer);
-      }, 90);
+        count += step;
+        if (count >= totalApps) {
+          count = totalApps;
+          clearInterval(timer);
+        }
+        el.textContent = count;
+      }, 60);
     }
-    setTimeout(animateStats, 1500);
+    setTimeout(animateStats, 1000);
 
     // ===================== LAST VISIT =====================
     function updateLastVisit() {
-      const lastVisit = localStorage.getItem('lastVisit');
-      const now = new Date();
-      if (lastVisit) {
-        const lastDate = new Date(lastVisit);
-        const diffDays = Math.floor(Math.abs(now - lastDate) / (1000*60*60*24));
-        document.getElementById('lastVisit').textContent = diffDays === 0 ? 'Today' : (diffDays === 1 ? 'Yesterday' : `${diffDays}d ago`);
-      } else { document.getElementById('lastVisit').textContent = 'First time'; }
-      localStorage.setItem('lastVisit', now.toISOString());
+      const el = document.getElementById('lastVisit');
+      if (!el) return;
+      try {
+        const lastVisit = localStorage.getItem('lastVisit');
+        const now = new Date();
+        if (lastVisit) {
+          const lastDate = new Date(lastVisit);
+          const diffDays = Math.floor(Math.abs(now - lastDate) / (1000*60*60*24));
+          el.textContent = diffDays === 0 ? 'Today' : (diffDays === 1 ? 'Yesterday' : `${diffDays}d ago`);
+        } else {
+          el.textContent = 'First time';
+        }
+        localStorage.setItem('lastVisit', now.toISOString());
+      } catch(e){
+        el.textContent = 'Today';
+      }
     }
     updateLastVisit();
 
-    // ===================== Hover glow =====================
+    // ===================== Hover glow for cards =====================
     const canHover = matchMedia('(hover: hover)').matches;
     if (canHover){
       for (const card of document.querySelectorAll('.card')){
@@ -918,89 +1466,116 @@
           card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
           card.style.setProperty('--my', (e.clientY - r.top) + 'px');
         }, {passive:true});
-        card.addEventListener('pointerleave', ()=>{ card.style.setProperty('--mx','50%'); card.style.setProperty('--my','50%'); }, {passive:true});
+        card.addEventListener('pointerleave', ()=>{
+          card.style.setProperty('--mx','50%');
+          card.style.setProperty('--my','50%');
+        }, {passive:true});
       }
     }
 
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // ===================== ICONS & MANIFEST (dynamic) =====================
-    function loadImage(url){ return new Promise((resolve, reject)=>{ const img=new Image(); img.crossOrigin="anonymous"; img.onload=()=>resolve(img); img.onerror=reject; img.src=url; }); }
-    function drawCover(ctx,img,size){ const iw=img.naturalWidth||img.width, ih=img.naturalHeight||img.height; const minSide=Math.min(iw,ih);
-      const sx=(iw-minSide)/2, sy=(ih-minSide)/2; ctx.clearRect(0,0,size,size); ctx.drawImage(img,sx,sy,minSide,minSide,0,0,size,size); }
-    async function generateIconDataURLs(){
-      const sizes=[16,32,48,72,96,128,144,152,180,192,384,512];
-      try{ const img=await loadImage(ICON_URL); const out={}; for (const s of sizes){ const c=document.createElement('canvas'); c.width=c.height=s; const x=c.getContext('2d'); drawCover(x,img,s); out[s]=c.toDataURL('image/png'); } return out; }
-      catch(e){ return null; }
-    }
-    (async function setupIconsAndManifest(){
-      const iconsMap = await generateIconDataURLs();
-      const use = (sz)=> iconsMap ? iconsMap[sz] : ICON_URL;
-      const addLink = (rel, sizes, href, type) => { const el=document.createElement('link'); el.rel=rel; if (sizes) el.sizes=sizes; if (type) el.type=type; el.href=href; document.head.appendChild(el); };
-      addLink('icon','16x16', use(16),'image/png'); addLink('icon','32x32', use(32),'image/png'); addLink('apple-touch-icon','180x180', use(180), null);
-
+    // ===================== SIMPLE MANIFEST SETUP (เบา ไม่ใช้ canvas) =====================
+    (function setupManifest(){
       const manifest = {
-        name: 'EBassWave AI Hub', short_name: 'EBassWave',
-        description: 'Your personal productivity hub - clean, modern design with futuristic aesthetics',
-        start_url: '/', scope: '/', display: 'standalone', orientation: 'portrait-primary',
-        background_color: '#0b111b', theme_color: '#0b111b', lang: 'en', dir: 'ltr',
-        categories: ['productivity','utilities','business'],
-        screenshots: [{ src: use(512), sizes: '512x512', type: 'image/png', form_factor: 'narrow' }],
+        name: 'EBassWave AI Hub',
+        short_name: 'EBassWave',
+        description: 'Your personal productivity hub - clean, fast, and AI-powered.',
+        start_url: './',
+        scope: './',
+        display: 'standalone',
+        orientation: 'portrait-primary',
+        background_color: '#0b111b',
+        theme_color: '#0b111b',
         icons: [
-          { src: use(48), sizes: '48x48', type:'image/png', purpose: 'any' },
-          { src: use(72), sizes: '72x72', type:'image/png', purpose: 'any' },
-          { src: use(96), sizes: '96x96', type:'image/png', purpose: 'any' },
-          { src: use(128), sizes: '128x128', type:'image/png', purpose: 'any' },
-          { src: use(144), sizes: '144x144', type:'image/png', purpose: 'any' },
-          { src: use(152), sizes: '152x152', type:'image/png', purpose: 'any' },
-          { src: use(180), sizes: '180x180', type:'image/png', purpose: 'any' },
-          { src: use(192), sizes: '192x192', type:'image/png', purpose: 'any' },
-          { src: use(384), sizes: '384x384', type:'image/png', purpose: 'any' },
-          { src: use(512), sizes: '512x512', type:'image/png', purpose: 'any' },
-          { src: use(192), sizes: '192x192', type:'image/png', purpose: 'any maskable' },
-          { src: use(512), sizes: '512x512', type:'image/png', purpose: 'any maskable' }
+          { src: ICON_URL, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: ICON_URL, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       };
-      const mblob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
-      const mlink = document.createElement('link'); mlink.rel='manifest'; mlink.href = URL.createObjectURL(mblob); document.head.appendChild(mlink);
+      try {
+        const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+        const url = URL.createObjectURL(blob);
+        const link = document.getElementById('app-manifest') || document.createElement('link');
+        link.rel = 'manifest';
+        link.href = url;
+        if (!link.parentNode) document.head.appendChild(link);
+      } catch(e){}
     })();
 
     // ===================== SERVICE WORKER =====================
     if ('serviceWorker' in navigator){
       const swCode = `
-        const CACHE_NAME = 'ebasswave-v3';
+        const CACHE_NAME = 'ebasswave-v3-lite';
         const urlsToCache = ['/', '/index.html', '${ICON_URL}'];
+
         self.addEventListener('install', event => {
-          event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)).then(() => self.skipWaiting()));
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then(cache => cache.addAll(urlsToCache))
+              .then(() => self.skipWaiting())
+          );
         });
+
         self.addEventListener('activate', event => {
-          event.waitUntil(caches.keys().then(names => Promise.all(names.map(n => n !== CACHE_NAME ? caches.delete(n) : null))).then(() => self.clients.claim()));
+          event.waitUntil(
+            caches.keys()
+              .then(names => Promise.all(
+                names.map(n => n !== CACHE_NAME ? caches.delete(n) : null)
+              ))
+              .then(() => self.clients.claim())
+          );
         });
+
         self.addEventListener('fetch', event => {
-          event.respondWith(caches.match(event.request).then(res => res || fetch(event.request)));
+          const req = event.request;
+          event.respondWith(
+            caches.match(req).then(res => res || fetch(req))
+          );
         });
       `;
-      const swBlob = new Blob([swCode], {type:'text/javascript'});
-      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+      try {
+        const swBlob = new Blob([swCode], {type:'text/javascript'});
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl).catch(()=>{});
+      } catch(e){}
     }
 
     // ===================== INSTALL PROMPT =====================
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
     const installContainer = document.getElementById('installContainer');
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installContainer.classList.add('show'); });
-    installBtn.addEventListener('click', async () => {
-      if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; installContainer.classList.remove('show'); }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (installContainer) installContainer.classList.add('show');
     });
-    window.addEventListener('appinstalled', () => { installContainer.classList.remove('show'); deferredPrompt = null; showToast('App installed successfully!'); });
-    if (window.matchMedia('(display-mode: standalone)').matches) { installContainer.style.display = 'none'; }
 
-    // ===================== Smooth scroll & Perf log =====================
+    if (installBtn) {
+      installBtn.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        try {
+          await deferredPrompt.userChoice;
+        } catch(e){}
+        deferredPrompt = null;
+        if (installContainer) installContainer.classList.remove('show');
+      });
+    }
+
+    window.addEventListener('appinstalled', () => {
+      if (installContainer) installContainer.classList.remove('show');
+      deferredPrompt = null;
+      showToast('App installed successfully!');
+    });
+
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+      if (installContainer) installContainer.style.display = 'none';
+    }
+
+    // ===================== Smooth scroll & Welcome toast =====================
     document.documentElement.style.scrollBehavior = 'smooth';
-    if ('performance' in window) { window.addEventListener('load', () => { const p = performance.getEntriesByType('navigation')[0]; if (p) console.log('Page load time:', p.loadEventEnd - p.loadEventStart, 'ms'); }); }
-
-    // Welcome message
     setTimeout(() => { showToast('Welcome to your personal AI Hub!'); }, 2000);
 
     // ===================== In-App Viewer Logic =====================
@@ -1019,7 +1594,6 @@
     const btnExternal = document.getElementById('btnExternal');
     const btnFullscreen = document.getElementById('btnFullscreen');
 
-    // Floating controls
     const floatingReload = document.getElementById('floatingReload');
     const floatingExternal = document.getElementById('floatingExternal');
     const floatingExit = document.getElementById('floatingExit');
@@ -1028,14 +1602,13 @@
     let embedTimer = null;
     let isFullscreen = false;
 
-    // FIX: visualViewport-based VH for mobile correctness
     function setVHVars(){
+      if (!viewerHeader) return;
       const vh = (window.visualViewport?.height || window.innerHeight) * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
       const hh = viewerHeader.getBoundingClientRect().height;
       document.documentElement.style.setProperty('--viewer-header-h', `${hh}px`);
     }
-    // Run on load & on changes
     setVHVars();
     window.addEventListener('resize', setVHVars);
     window.addEventListener('orientationchange', setVHVars);
@@ -1044,15 +1617,15 @@
       window.visualViewport.addEventListener('scroll', setVHVars);
     }
 
-    // Build app map from cards (slug -> {name,url,glow})
+    // Build app map from cards
     const appMap = {};
     document.querySelectorAll('#appGrid a.card').forEach(card => {
       const name = card.dataset.name || card.getAttribute('aria-label') || card.querySelector('.title')?.textContent?.trim() || 'App';
       const slug = (card.dataset.app || name).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
       const url = card.getAttribute('href');
       const glow = getComputedStyle(card).getPropertyValue('--glow') || 'var(--cyan)';
-      appMap[slug] = { name, url, glow };
-      // Intercept click for in-app open (pass event for fullscreen permission)
+      appMap[slug] = { name, url, glow, cardEl: card };
+
       card.addEventListener('click', (e) => {
         e.preventDefault();
         openApp(slug, e);
@@ -1060,89 +1633,77 @@
     });
 
     function applyGlowToIco(glow){
+      if (!viewerIco) return;
       viewerIco.style.background = `linear-gradient(135deg, color-mix(in oklab, ${glow} 25%, rgba(15,22,37,.9)), color-mix(in oklab, ${glow} 15%, rgba(10,18,32,.95)))`;
       viewerIco.style.boxShadow = `inset 0 0 0 1px color-mix(in oklab, ${glow} 38%, rgba(255,255,255,.1)), 0 0 18px color-mix(in oklab, ${glow} 22%, transparent)`;
     }
 
-    // NEW: Try requesting real browser fullscreen (silent if blocked)
-    async function tryBrowserFullscreen(evt){
+    async function tryBrowserFullscreen(){
+      if (!PREFER_BROWSER_FULLSCREEN) return;
       if (document.fullscreenElement) return;
-      const targetEl = document.getElementById('viewer');
+      const targetEl = viewer;
+      if (!targetEl) return;
       try {
-        if (targetEl.requestFullscreen) {
-          await targetEl.requestFullscreen();
-        } else if (targetEl.webkitRequestFullscreen) {
-          await targetEl.webkitRequestFullscreen();
-        }
-      } catch(e){
-        // silently ignore
-      }
+        if (targetEl.requestFullscreen) await targetEl.requestFullscreen();
+        else if (targetEl.webkitRequestFullscreen) await targetEl.webkitRequestFullscreen();
+      } catch(e){}
     }
 
     function openApp(slug, evt){
       const app = appMap[slug];
-      if (!app) return;
+      if (!app || !viewer || !appFrame) return;
       currentApp = app;
 
-      // Lock background scroll and show overlay
+      // track recent (ใช้จาก search module)
+      if (window._ebass_saveRecentSlug) window._ebass_saveRecentSlug(slug);
+
       document.body.classList.add('noscroll');
       viewer.classList.add('show');
       viewer.setAttribute('aria-hidden','false');
 
-      viewerTitle.textContent = app.name;
+      if (viewerTitle) viewerTitle.textContent = app.name;
       applyGlowToIco(app.glow);
-      viewerLoader.classList.add('show');
-      viewerMsg.classList.remove('show');
+      if (viewerLoader) viewerLoader.classList.add('show');
+      if (viewerMsg) viewerMsg.classList.remove('show');
 
-      // Ensure correct heights after header laid out
       setVHVars();
 
-      // ====== Auto Fullscreen on open (ALL platforms) ======
+      // CSS fullscreen (เฉพาะ mobile ตาม setting)
       if (AUTO_FULL_ON_OPEN) {
-        // 1) CSS fullscreen mode
         toggleFullscreen(true);
-        // 2) Real browser fullscreen (if allowed)
-        if (PREFER_BROWSER_FULLSCREEN) {
-          tryBrowserFullscreen(evt);
-        }
+        tryBrowserFullscreen(evt);
       }
-      // =====================================================
 
       appFrame.src = app.url;
 
-      // History state & lastApp
       if (location.search !== `?app=${encodeURIComponent(slug)}`) {
         history.pushState({ app: slug }, '', `?app=${encodeURIComponent(slug)}`);
       }
       try { localStorage.setItem('lastApp', slug); } catch(e){}
 
-      // Fallback if embedding blocked / slow
       clearTimeout(embedTimer);
       embedTimer = setTimeout(() => {
-        viewerMsg.classList.add('show');
+        if (viewerMsg) viewerMsg.classList.add('show');
       }, 2500);
     }
 
     function closeViewer(){
+      if (!viewer || !appFrame) return;
       viewer.classList.remove('show');
       viewer.setAttribute('aria-hidden','true');
       document.body.classList.remove('noscroll');
-      viewerLoader.classList.remove('show');
-      viewerMsg.classList.remove('show');
+      if (viewerLoader) viewerLoader.classList.remove('show');
+      if (viewerMsg) viewerMsg.classList.remove('show');
       appFrame.removeAttribute('src');
       currentApp = null;
-      
-      // Reset CSS fullscreen state
+
       if (isFullscreen) {
         toggleFullscreen(false);
       }
-
-      // NEW: Exit real browser fullscreen if still active
       if (document.fullscreenElement) {
         try { document.exitFullscreen(); } catch(e){}
       }
 
-      // Clean URL (go back if state was pushed)
       if (history.state && history.state.app) {
         history.back();
       } else {
@@ -1153,114 +1714,126 @@
     }
 
     function toggleFullscreen(force = null) {
+      if (!viewer || !btnFullscreen) return;
       isFullscreen = force !== null ? force : !isFullscreen;
-      
+
       if (isFullscreen) {
         viewer.classList.add('fullscreen');
         btnFullscreen.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
+            <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
+            <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
+            <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+          </svg>
           Exit
         `;
         btnFullscreen.title = 'Exit fullscreen';
       } else {
         viewer.classList.remove('fullscreen');
         btnFullscreen.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+            <path d="M16 3h3a2 2 0 0 1 2 2v3"/>
+            <path d="M8 21H5a2 2 0 0 1-2-2v-3"/>
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>
           Full
         `;
         btnFullscreen.title = 'Fullscreen';
       }
     }
 
-    // iframe load handler -> hide loader/message
-    appFrame.addEventListener('load', () => {
-      clearTimeout(embedTimer);
-      viewerLoader.classList.remove('show');
-      viewerMsg.classList.remove('show');
-    });
+    if (appFrame) {
+      appFrame.addEventListener('load', () => {
+        clearTimeout(embedTimer);
+        if (viewerLoader) viewerLoader.classList.remove('show');
+        if (viewerMsg) viewerMsg.classList.remove('show');
+      });
+    }
 
-    // Controls
-    btnClose.addEventListener('click', closeViewer);
-    btnReload.addEventListener('click', () => {
-      if (!currentApp) return;
-      viewerLoader.classList.add('show');
-      appFrame.src = currentApp.url; // reload src
-    });
-    btnExternal.addEventListener('click', () => { if (currentApp) window.open(currentApp.url, '_blank', 'noopener'); });
-    btnFullscreen.addEventListener('click', () => toggleFullscreen());
-
-    // Floating controls
-    floatingReload.addEventListener('click', () => {
-      if (!currentApp) return;
+    if (btnClose) btnClose.addEventListener('click', closeViewer);
+    if (btnReload) btnReload.addEventListener('click', () => {
+      if (!currentApp || !appFrame || !viewerLoader) return;
       viewerLoader.classList.add('show');
       appFrame.src = currentApp.url;
     });
-    floatingExternal.addEventListener('click', () => { if (currentApp) window.open(currentApp.url, '_blank', 'noopener'); });
-    floatingExit.addEventListener('click', () => toggleFullscreen(false));
+    if (btnExternal) btnExternal.addEventListener('click', () => {
+      if (currentApp) window.open(currentApp.url, '_blank', 'noopener');
+    });
+    if (btnFullscreen) btnFullscreen.addEventListener('click', () => toggleFullscreen());
 
-    // NEW: Touch/swipe gestures for mobile
+    if (floatingReload) floatingReload.addEventListener('click', () => {
+      if (!currentApp || !appFrame || !viewerLoader) return;
+      viewerLoader.classList.add('show');
+      appFrame.src = currentApp.url;
+    });
+    if (floatingExternal) floatingExternal.addEventListener('click', () => {
+      if (currentApp) window.open(currentApp.url, '_blank', 'noopener');
+    });
+    if (floatingExit) floatingExit.addEventListener('click', () => toggleFullscreen(false));
+
+    // Touch/swipe gestures
     let touchStartY = 0;
     let touchStartTime = 0;
 
-    viewer.addEventListener('touchstart', (e) => {
-      if (!isFullscreen) return;
-      touchStartY = e.touches[0].clientY;
-      touchStartTime = Date.now();
-    }, { passive: true });
+    if (viewer) {
+      viewer.addEventListener('touchstart', (e) => {
+        if (!isFullscreen) return;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+      }, { passive: true });
 
-    viewer.addEventListener('touchmove', (e) => {
-      if (!isFullscreen) return;
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchY - touchStartY;
-      
-      // Show swipe indicator when swiping down
-      if (deltaY > 50) {
-        swipeIndicator.style.opacity = '1';
-        swipeIndicator.textContent = 'Release to exit fullscreen';
-      } else {
-        swipeIndicator.style.opacity = '0.7';
-        swipeIndicator.textContent = 'Swipe down to exit fullscreen';
-      }
-    }, { passive: true });
+      viewer.addEventListener('touchmove', (e) => {
+        if (!isFullscreen || !swipeIndicator) return;
+        const touchY = e.touches[0].clientY;
+        const deltaY = touchY - touchStartY;
 
-    viewer.addEventListener('touchend', (e) => {
-      if (!isFullscreen) return;
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaY = touchEndY - touchStartY;
-      const deltaTime = Date.now() - touchStartTime;
-      
-      // Exit fullscreen if swipe down is significant
-      if (deltaY > 100 && deltaTime < 500) {
-        toggleFullscreen(false);
-      }
-      
-      // Reset swipe indicator
-      setTimeout(() => {
-        swipeIndicator.style.opacity = '';
-        swipeIndicator.textContent = 'Swipe down to exit fullscreen';
-      }, 300);
-    }, { passive: true });
+        if (deltaY > 50) {
+          swipeIndicator.style.opacity = '1';
+          swipeIndicator.textContent = 'Release to exit fullscreen';
+        } else {
+          swipeIndicator.style.opacity = '0.7';
+          swipeIndicator.textContent = 'Swipe down to exit fullscreen';
+        }
+      }, { passive: true });
 
-    // ESC to close / exit fullscreen
-    document.addEventListener('keydown', (e) => { 
+      viewer.addEventListener('touchend', (e) => {
+        if (!isFullscreen || !swipeIndicator) return;
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaY = touchEndY - touchStartY;
+        const deltaTime = Date.now() - touchStartTime;
+
+        if (deltaY > 100 && deltaTime < 500) {
+          toggleFullscreen(false);
+        }
+
+        setTimeout(() => {
+          swipeIndicator.style.opacity = '';
+          swipeIndicator.textContent = 'Swipe down to exit fullscreen';
+        }, 300);
+      }, { passive: true });
+    }
+
+    // ESC key
+    document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        if (viewer.classList.contains('show')) {
-          if (isFullscreen) {
-            toggleFullscreen(false);
-          } else {
-            closeViewer();
-          }
+        if (viewer && viewer.classList.contains('show')) {
+          if (isFullscreen) toggleFullscreen(false);
+          else closeViewer();
         }
       }
     });
 
-    // Handle popstate (Back/Forward)
+    // History popstate
     window.addEventListener('popstate', (e) => {
       const slug = e.state?.app || new URLSearchParams(location.search).get('app');
       if (slug && appMap[slug]) {
-        if (!viewer.classList.contains('show') || currentApp?.name !== appMap[slug].name) openApp(slug);
+        if (!viewer || !viewer.classList.contains('show') || currentApp?.name !== appMap[slug].name) {
+          openApp(slug);
+        }
       } else {
-        if (viewer.classList.contains('show')) closeViewer();
+        if (viewer && viewer.classList.contains('show')) closeViewer();
       }
     });
 
@@ -1269,7 +1842,6 @@
       const slug = new URLSearchParams(location.search).get('app');
       if (slug && appMap[slug]) openApp(slug);
     })();
-
   </script>
 </body>
 </html>
